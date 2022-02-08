@@ -11,9 +11,12 @@ namespace KiraiMod
         public override void Load()
         {
             Shared.Logger = Log;
+            Shared.Config = Config;
+            Shared.Harmony = new("me.kiraihooks.KiraiMod");
 
             typeof(Events).Initialize();
-            typeof(Managers.AssetManager).Initialize();
+            typeof(GUI.GUIManager).Initialize();
+            typeof(Managers.ModuleManager).Initialize();
         }
     }
 }
