@@ -1,4 +1,6 @@
-﻿using BepInEx;
+﻿global using Object = UnityEngine.Object;
+
+using BepInEx;
 using BepInEx.IL2CPP;
 
 namespace KiraiMod
@@ -9,11 +11,9 @@ namespace KiraiMod
         public override void Load()
         {
             Shared.Logger = Log;
-        }
 
-        public override bool Unload()
-        {
-            return base.Unload();
+            typeof(Events).Initialize();
+            typeof(Managers.AssetManager).Initialize();
         }
     }
 }
