@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
 namespace KiraiMod.Extensions
 {
@@ -10,6 +12,13 @@ namespace KiraiMod.Extensions
         {
             UnityEngine.Object.DontDestroyOnLoad(go);
             return go;
+        }
+
+        public static EventTrigger.Entry Setup(this EventTrigger.Entry entry, EventTriggerType type, UnityAction<BaseEventData> callback)
+        {
+            entry.eventID = type;
+            entry.callback.AddListener(callback);
+            return entry;
         }
     }
 }
