@@ -1,13 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using KiraiMod.Managers;
+using UnityEngine.InputSystem;
 
 namespace KiraiMod.Modules
 {
     public static class Flight
     {
+        static Flight()
+        {
+            Shared.Config.Bind(
+                "Flight",
+                "keybind",
+                new Key[] { Key.LeftCtrl, Key.F },
+                "The keybind to toggle flight"
+            ).RegisterKeybind(() => State ^= true);
+        }
+
         private static bool state;
         public static bool State
         {

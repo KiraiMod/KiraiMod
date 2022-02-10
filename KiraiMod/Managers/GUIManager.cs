@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace KiraiMod.Managers
 {
@@ -17,6 +18,13 @@ namespace KiraiMod.Managers
         static GUIManager()
         {
             Events.UIManagerLoaded += OnUIManagerLoaded;
+
+            Shared.Config.Bind(
+                "GUI",
+                "Keybind",
+                new Key[] { Key.RightShift },
+                "The keybind you want to use to open the GUI"
+            ).RegisterKeybind(() => UserInterface.gameObject.active ^= true);
         }
 
         private static void OnUIManagerLoaded()
