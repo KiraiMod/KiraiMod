@@ -15,6 +15,7 @@ namespace KiraiMod
             Shared.Harmony = new("me.kiraihooks.KiraiMod");
 
             typeof(Events).Initialize();
+
             typeof(Managers.ManagerManager).Initialize();
         }
     }

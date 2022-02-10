@@ -1,10 +1,12 @@
-﻿using System;
+﻿using BepInEx.Configuration;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 namespace KiraiMod.Managers
 {
@@ -84,6 +86,27 @@ namespace KiraiMod.Managers
             sw.Stop();
 
             Shared.Logger.LogInfo($"Setup GUI in {sw.Elapsed.Milliseconds} ms");
+        }
+
+        public static void GUIBind(this ConfigEntry<bool> entry, Toggle toggle) => entry.SettingChanged += ((EventHandler)((sender, args) => toggle.Set(entry.Value, false))).Invoke();
+        public static void GUIBind(this ConfigEntry<float> entry, KiraiSlider toggle) => entry.SettingChanged += ((EventHandler)((sender, args) => toggle.slider.Set(entry.Value))).Invoke();
+
+        public class KiraiSlider
+        {
+            public Text text;
+            public Slider slider;
+
+            public KiraiSlider(Transform obj)
+            {
+                text = obj.GetComponent<Text>();
+                slider = obj.GetComponent<Slider>();
+
+                if (text != null)
+                {
+                    string format = text.text;
+                    slider.onValueChanged.AddListener(new Action<float>(value => text.text = string.Format(format, value)));
+                }
+            }
         }
     }
 }

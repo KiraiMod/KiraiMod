@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
@@ -19,6 +20,12 @@ namespace KiraiMod.Extensions
             entry.eventID = type;
             entry.callback.AddListener(callback);
             return entry;
+        }
+
+        public static EventHandler Invoke(this EventHandler handler)
+        {
+            handler(null, null);
+            return handler;
         }
     }
 }
