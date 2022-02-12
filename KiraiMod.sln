@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31919.166
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KiraiMod", "KiraiMod\KiraiMod.csproj", "{0DA10FE1-026A-4948-B1A9-9326CBC0A921}"
 EndProject
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "KiraiMod.Server", "KiraiMod.Server\KiraiMod.Server.njsproj", "{0D86AFE4-D15B-41A1-B57B-AA449A56DD07}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{0DA10FE1-026A-4948-B1A9-9326CBC0A921}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0DA10FE1-026A-4948-B1A9-9326CBC0A921}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0DA10FE1-026A-4948-B1A9-9326CBC0A921}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D86AFE4-D15B-41A1-B57B-AA449A56DD07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D86AFE4-D15B-41A1-B57B-AA449A56DD07}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D86AFE4-D15B-41A1-B57B-AA449A56DD07}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D86AFE4-D15B-41A1-B57B-AA449A56DD07}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
