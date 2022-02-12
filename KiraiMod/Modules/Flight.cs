@@ -11,26 +11,10 @@ namespace KiraiMod.Modules
 {
     public static class Flight
     {
-        public static readonly ConfigEntry<bool> directional = Shared.Config.Bind(
-            "Flight",
-            "Directional",
-            false,
-            "Should you move in the direction you are looking"
-        );
-
-        public static readonly ConfigEntry<bool> noclip = Shared.Config.Bind(
-            "Flight",
-            "NoClip",
-            false,
-            "Should you be able to go through solid objects"
-        );
-
-        public static readonly ConfigEntry<float> speed = Shared.Config.Bind(
-            "Flight",
-            "Speed",
-            8.0f,
-            "The speed in meters per second at which you fly"
-        );
+        public static readonly ConfigEntry<bool> directional = Shared.Config.Bind("Flight", "Directional", false, "Should you move in the direction you are looking");
+        public static readonly ConfigEntry<bool> noclip /**/ = Shared.Config.Bind("Flight", "NoClip", false," Should you be able to go through solid objects");
+        public static readonly ConfigEntry<float> speed /**/ = Shared.Config.Bind("Flight", "Speed", 8.0f, "The speed in meters per second at which you fly");
+        public static readonly ConfigEntry<Key[]> keybind = Shared.Config.Bind("Flight", "keybind", new Key[] { Key.LeftCtrl, Key.F }, "The keybind to toggle flight");
 
         private static bool state;
         public static bool State
@@ -46,37 +30,14 @@ namespace KiraiMod.Modules
             }
         }
 
-        private static Collider collider;
-
         static Flight()
         {
-            Shared.Config.Bind(
-                "Flight",
-                "keybind",
-                new Key[] { Key.LeftCtrl, Key.F },
-                "The keybind to toggle flight"
-            ).RegisterKeybind(() => State ^= true);
+            keybind.RegisterKeybind(() => State ^= true);
+            
+            noclip.SettingChanged += (sender, args) => Collisions.Set(noclip.Value);
+            directional.SettingChanged += (sender, args) => Target.Fetch();
 
-            noclip.SettingChanged += ((System.EventHandler)((sender, args) => {
-                bool val = noclip.Value;
-                if (val) Events.WorldLoaded += WorldLoaded;
-                else Events.WorldLoaded -= WorldLoaded;
-
-                if (collider == null)
-                {
-                    if (Networking.LocalPlayer == null) return;
-                    collider = Networking.LocalPlayer.gameObject.GetComponent<Collider>();
-                }
-
-                collider.enabled = !val;
-            })).Invoke();
-
-            Harmony.CreateAndPatchAll(typeof(Flight));
-        }
-
-        private static void WorldLoaded(UnityEngine.SceneManagement.Scene scene)
-        {
-            // TODO: redo noclip if enabled;
+            typeof(Hooks).Initialize();
         }
 
         private static Vector3 oGrav = new(0, -9.8f, 0);
@@ -88,7 +49,10 @@ namespace KiraiMod.Modules
             if (XRDevice.isPresent)
                 Events.Update += UpdateVR;
             else Events.Update += UpdateDesktop;
-
+            Events.WorldLoaded += WorldLoaded;
+            if (noclip.Value)
+                Collisions.Set(true);
+            Target.Fetch();
         }
 
         private static void Disable()
@@ -96,13 +60,28 @@ namespace KiraiMod.Modules
             if (XRDevice.isPresent)
                 Events.Update -= UpdateVR;
             else Events.Update -= UpdateDesktop;
+            Events.WorldLoaded -= WorldLoaded;
+            Collisions.Set(false);
 
             Physics.gravity = oGrav;
         }
 
+        private static void WorldLoaded(UnityEngine.SceneManagement.Scene scene) => Events.Update += UpdateCheck;
+        private static void UpdateCheck()
+        {
+            if (Networking.LocalPlayer == null)
+                return;
+
+            Events.Update -= UpdateCheck;
+
+            if (noclip.Value)
+                Collisions.Set(true);
+            Target.Fetch();
+        }
+
         private static void UpdateDesktop()
         {
-            if (Networking.LocalPlayer is null) return;
+            if (Networking.LocalPlayer == null) return;
 
             unsafe
             {
@@ -110,11 +89,11 @@ namespace KiraiMod.Modules
                 float _speed = speed.Value;
 
                 Networking.LocalPlayer.gameObject.transform.position +=
-                    Networking.LocalPlayer.gameObject.transform.forward * _speed * Time.deltaTime *
+                    Target.value.forward * _speed * Time.deltaTime *
                         (ToByte(Input.GetKey(KeyCode.W)) + ~ToByte(Input.GetKey(KeyCode.S)) + 1) * (shift * 8 + 1)
-                    + Networking.LocalPlayer.gameObject.transform.right * _speed * Time.deltaTime *
+                    + Target.value.right * _speed * Time.deltaTime *
                         (ToByte(Input.GetKey(KeyCode.D)) + ~ToByte(Input.GetKey(KeyCode.A)) + 1) * (shift * 8 + 1)
-                    + Networking.LocalPlayer.gameObject.transform.up * _speed * Time.deltaTime *
+                    + Target.value.up * _speed * Time.deltaTime *
                         (ToByte(Input.GetKey(KeyCode.E)) + ~ToByte(Input.GetKey(KeyCode.Q)) + 1) * (shift * 8 + 1);
             }
 
@@ -123,13 +102,13 @@ namespace KiraiMod.Modules
 
         private static void UpdateVR()
         {
-            if (Networking.LocalPlayer is null) return;
+            if (Networking.LocalPlayer == null) return;
             float _speed = speed.Value;
 
             Networking.LocalPlayer.gameObject.transform.position +=
-                Networking.LocalPlayer.gameObject.transform.forward * _speed * Time.deltaTime * Input.GetAxis("Vertical")
-                + Networking.LocalPlayer.gameObject.transform.right * _speed * Time.deltaTime * Input.GetAxis("Horizontal")
-                + Networking.LocalPlayer.gameObject.transform.up * _speed * Time.deltaTime * Input.GetAxis("Oculus_CrossPlatform_SecondaryThumbstickVertical");
+                Target.value.forward * _speed * Time.deltaTime * Input.GetAxis("Vertical")
+                + Target.value.right * _speed * Time.deltaTime * Input.GetAxis("Horizontal")
+                + Target.value.up * _speed * Time.deltaTime * Input.GetAxis("Oculus_CrossPlatform_SecondaryThumbstickVertical");
 
             Networking.LocalPlayer.SetVelocity(new Vector3(0f, 0f, 0f));
         }
@@ -137,14 +116,50 @@ namespace KiraiMod.Modules
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static unsafe byte ToByte(bool from) => *(byte*)&from;
 
-        [HarmonyPrefix, HarmonyPatch(typeof(Physics), nameof(Physics.gravity), MethodType.Setter)]
-        internal static bool Hook_set_gravity(Vector3 __0)
+        private static class Collisions
         {
-            if (__0.magnitude == 0)
-                return true;
+            private static Collider collider;
 
-            oGrav = __0;
-            return !state;
+            public static void Set(bool state)
+            {
+                if (collider == null)
+                {
+                    if (Networking.LocalPlayer == null) return;
+                    collider = Networking.LocalPlayer.gameObject.GetComponent<Collider>();
+                }
+
+                collider.enabled = !state;
+            }
+        }
+
+        private static class Target
+        {
+            public static Transform value;
+
+            public static void Fetch()
+            {
+                if (Networking.LocalPlayer == null)
+                    return;
+
+                value = directional.Value
+                    ? GameObject.Find("_Application/TrackingVolume/TrackingSteam(Clone)/SteamCamera/[CameraRig]/Neck/Camera (head)").transform
+                    : Networking.LocalPlayer.gameObject.transform;
+            }
+        }
+
+        private static class Hooks
+        {
+            static Hooks() => Harmony.CreateAndPatchAll(typeof(Hooks));
+
+            [HarmonyPrefix, HarmonyPatch(typeof(Physics), nameof(Physics.gravity), MethodType.Setter)]
+            public static bool Hook_set_gravity(Vector3 __0)
+            {
+                if (__0.magnitude == 0)
+                    return true;
+
+                oGrav = __0;
+                return !state;
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 <Project>
 	<Target Name="BuildScripts" AfterTargets="PostBuildEvent">
 		<Exec Command='
+			IF EXIST "$(TargetDir)..\..\..\.private" ( exit ) 
 			MKDIR "C:/Program Files (x86)/Steam/steamapps/common/VRChat.BepInEx/BepInEx/Plugins/KiraiMod"
 			COPY "$(TargetPath)" "C:/Program Files (x86)/Steam/steamapps/common/VRChat.BepInEx/BepInEx/Plugins/KiraiMod"
 			cmd /c "exit /b 0"
