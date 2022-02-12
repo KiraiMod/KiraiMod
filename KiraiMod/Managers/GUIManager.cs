@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
@@ -21,26 +22,34 @@ namespace KiraiMod.Managers
         {
             Events.UIManagerLoaded += OnUIManagerLoaded;
 
-            Shared.Config.Bind(
-                "GUI",
-                "Keybind",
-                new Key[] { Key.RightShift },
-                "The keybind you want to use to open the GUI"
-            ).RegisterKeybind(() => UserInterface.gameObject.active ^= true);
+            Shared.Config.Bind("GUI", "Keybind", new Key[] { Key.RightShift }, "The keybind you want to use to open the GUI").RegisterKeybind(() => UserInterface.gameObject.active ^= true);
         }
 
         private static void OnUIManagerLoaded()
+        {
+            Fix();
+            Load();
+            Instantiate();
+            Setup();
+        }
+
+        private static void Fix()
+        {
+            var system = GameObject.Find("_Application/UiEventSystem");
+            system.GetComponent<EventSystem>().m_SystemInputModules.Add(
+                system.AddComponent<StandaloneInputModule>()
+            );
+        }
+
+        private static void Load()
         {
             MemoryStream mem = new();
             Assembly.GetExecutingAssembly().GetManifestResourceStream("KiraiMod.Lib.KiraiMod.GUI.AssetBundle").CopyTo(mem);
             bundle = AssetBundle.LoadFromMemory(mem.ToArray());
             bundle.hideFlags |= HideFlags.HideAndDontSave;
-
-            Load();
-            Setup();
         }
 
-        private static void Load()
+        private static void Instantiate()
         {
             GUI = bundle.LoadAsset("assets/kiraimod.gui.prefab")
                 .Cast<GameObject>()
