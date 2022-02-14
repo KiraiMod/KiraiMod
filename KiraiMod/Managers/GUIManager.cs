@@ -13,35 +13,55 @@ namespace KiraiMod.Managers
 {
     public static class GUIManager
     {
+        public static event Action<bool> OnUIToggle;
+
         public static GameObject GUI;
-        public static Transform UserInterface;
+        public static GameObject UserInterface;
 
         private static AssetBundle bundle;
+
+        private static EventSystem system;
+        private static BaseInputModule inputFix;
+        private static BaseInputModule inputOrig;
+
+        public static bool Showing
+        {
+            get => UserInterface.active;
+            set
+            {
+                if (UserInterface.active == value)
+                    return;
+
+                UserInterface.active = value;
+                OnUIToggle?.Invoke(value);
+
+                inputOrig.enabled = !(inputFix.enabled = value);
+            }
+        }
 
         static GUIManager()
         {
             Events.UIManagerLoaded += OnUIManagerLoaded;
 
-            Shared.Config.Bind("GUI", "Keybind", new Key[] { Key.RightShift }, "The keybind you want to use to open the GUI").RegisterKeybind(() => UserInterface.gameObject.active ^= true);
+            Shared.Config.Bind("GUI", "Keybind", new Key[] { Key.RightShift }, "The keybind you want to use to open the GUI").RegisterKeybind(() => Showing ^= true);
         }
 
         private static void OnUIManagerLoaded()
         {
-            Fix();
-            Load();
-            Instantiate();
-            Setup();
+            SetupFix();
+            LoadAssetBundle();
+            CreateUI();
+            SetupHandlers();
         }
 
-        private static void Fix()
+        private static void SetupFix()
         {
-            var system = GameObject.Find("_Application/UiEventSystem");
-            system.GetComponent<EventSystem>().m_SystemInputModules.Add(
-                system.AddComponent<StandaloneInputModule>()
-            );
+            var sys = GameObject.Find("_Application/UiEventSystem");
+            inputOrig = (system = sys.GetComponent<EventSystem>()).m_SystemInputModules[0];
+            (inputFix = sys.AddComponent<StandaloneInputModule>()).enabled = false;
         }
 
-        private static void Load()
+        private static void LoadAssetBundle()
         {
             MemoryStream mem = new();
             Assembly.GetExecutingAssembly().GetManifestResourceStream("KiraiMod.Lib.KiraiMod.GUI.AssetBundle").CopyTo(mem);
@@ -49,7 +69,7 @@ namespace KiraiMod.Managers
             bundle.hideFlags |= HideFlags.HideAndDontSave;
         }
 
-        private static void Instantiate()
+        private static void CreateUI()
         {
             GUI = bundle.LoadAsset("assets/kiraimod.gui.prefab")
                 .Cast<GameObject>()
@@ -61,17 +81,17 @@ namespace KiraiMod.Managers
             Shared.Logger.LogInfo("Loaded GUI");
         }
 
-        private static void Setup()
+        private static void SetupHandlers()
         {
             Stopwatch sw = new();
 
-            UserInterface = GUI.transform.Find("UserInterface");
+            UserInterface = GUI.transform.Find("UserInterface").gameObject;
 
             Type[] handlers = ModuleManager.Modules["KiraiMod.GUI"];
 
-            for (int i = 0; i < UserInterface.childCount; i++)
+            for (int i = 0; i < UserInterface.transform.childCount; i++)
             {
-                Transform child = UserInterface.GetChild(i);
+                Transform child = UserInterface.transform.GetChild(i);
                 Type handler = handlers.FirstOrDefault(x => x.Name == child.name);
 
                 if (handler == null)
@@ -90,7 +110,7 @@ namespace KiraiMod.Managers
                 setup.Invoke(null, new object[1] { child });
             }
 
-            UserInterface.gameObject.active = false;
+            UserInterface.active = false;
 
             sw.Stop();
 
