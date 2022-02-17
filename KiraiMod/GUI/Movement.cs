@@ -1,7 +1,5 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using static KiraiMod.Managers.GUIManager;
 
@@ -15,18 +13,11 @@ namespace KiraiMod.GUI
 
         public static KiraiSlider flightSpeed;
 
-        public static Transform Root;
-        public static Transform Body;
-
         public static void Setup(Transform self)
         {
-            Root = self;
-            Body = self.Find(nameof(Body));
+            Common.Window.Create(self);
 
-            EventTrigger trigger = self.Find("Title").gameObject.AddComponent<EventTrigger>();
-            trigger.triggers = new(2);
-            trigger.triggers.Add(new EventTrigger.Entry().Setup(EventTriggerType.Drag, (UnityAction<BaseEventData>)OnDrag));
-            trigger.triggers.Add(new EventTrigger.Entry().Setup(EventTriggerType.PointerClick, (UnityAction<BaseEventData>)OnClick));
+            Transform Body = self.Find("Body");
 
             (flight = Body.Find("Flight").GetComponent<Toggle>()).onValueChanged.AddListener(new Action<bool>(state => Modules.Flight.State = state));
             (directional = Body.Find("Directional").GetComponent<Toggle>()).onValueChanged.AddListener(new Action<bool>(state => Modules.Flight.directional.Value = state));
@@ -37,8 +28,5 @@ namespace KiraiMod.GUI
             Modules.Flight.noclip.GUIBind(noclip);
             Modules.Flight.speed.GUIBind(flightSpeed);
         }
-
-        private static void OnDrag(BaseEventData data) => Root.position += (Vector3)data.Cast<PointerEventData>().delta;
-        private static void OnClick(BaseEventData data) => Body.gameObject.active ^= !data.Cast<PointerEventData>().dragging;
     }
 }

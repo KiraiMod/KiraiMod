@@ -17,8 +17,9 @@ namespace KiraiMod.Managers
                 .GroupBy(x => x.Namespace)
                 .ToDictionary(x => x.Key, x => x.ToArray());
 
-            foreach (Type module in Modules["KiraiMod.Modules"]) 
-                module.Initialize();
+            foreach (Type module in Modules["KiraiMod.Modules"])
+                if (!module.IsNested)
+                    module.Initialize();
         }
     }
 }

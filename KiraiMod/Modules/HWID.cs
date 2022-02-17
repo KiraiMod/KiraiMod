@@ -22,7 +22,7 @@ namespace KiraiMod.Modules
             var config = Shared.Config.Bind<string>("HWID", "Target", null, "The target hardware ID that you will be spoofed to.\nSet empty for a new one.");
             target = config.Value;
             if (string.IsNullOrWhiteSpace(target))
-                config.Value = target = string.Join("", Enumerable.Range(0, old.Length >> 1).Select(x => UnityEngine.Random.Range(0, 255).ToString("x2")));
+                config.Value = target = Generate(old.Length);
 
             Shared.Logger.LogInfo("New HWID: " + target);
 
@@ -35,6 +35,8 @@ namespace KiraiMod.Modules
                 Abort("HWID is still the original after spoofing");
             else Shared.Logger.LogMessage("Successfully spoofed HWID");
         }
+
+        public static string Generate(int length) => string.Join("", Enumerable.Range(0, length >> 1).Select(x => UnityEngine.Random.Range(0, 255).ToString("x2")));
 
         private static void Abort(string message)
         {
