@@ -15,9 +15,11 @@ namespace KiraiMod.GUI
 
         public static void Setup(Transform self)
         {
-            Common.Window.Create(self);
-
             Transform Body = self.Find("Body");
+
+            Common.Window.Create(self, self.Find("Title"), Body)
+                .Dragable()
+                .Closable();
 
             (flight = Body.Find("Flight").GetComponent<Toggle>()).onValueChanged.AddListener(new Action<bool>(state => Modules.Movement.State = state));
             (directional = Body.Find("Directional").GetComponent<Toggle>()).onValueChanged.AddListener(new Action<bool>(state => Modules.Movement.directional.Value = state));
