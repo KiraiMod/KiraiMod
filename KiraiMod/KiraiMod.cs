@@ -2,6 +2,7 @@
 
 using BepInEx;
 using BepInEx.IL2CPP;
+using KiraiMod.Managers;
 
 namespace KiraiMod
 {
@@ -16,7 +17,9 @@ namespace KiraiMod
 
             typeof(Events).Initialize();
 
-            typeof(Managers.ManagerManager).Initialize();
+            typeof(KeybindManager).Initialize();
+            typeof(ModuleManager).Initialize();
+            typeof(GUIManager).Initialize(); 
         }
     }
 }

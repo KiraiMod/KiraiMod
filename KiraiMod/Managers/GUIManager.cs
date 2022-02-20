@@ -13,6 +13,7 @@ namespace KiraiMod.Managers
 {
     public static class GUIManager
     {
+        public static event Action OnLoad;
         public static event Action<bool> OnUIToggle;
 
         public static GameObject GUI;
@@ -77,6 +78,8 @@ namespace KiraiMod.Managers
                 .DontDestroyOnLoad();
 
             GUI.name = "KiraiMod.GUI";
+
+            OnLoad?.Invoke();
 
             Shared.Logger.LogInfo("Loaded GUI");
         }

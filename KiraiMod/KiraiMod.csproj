@@ -96,7 +96,6 @@
     <Compile Include="Managers\GUIManager.cs" />
     <Compile Include="KiraiMod.cs" />
     <Compile Include="Managers\KeybindManager.cs" />
-    <Compile Include="Managers\ManagerManager.cs" />
     <Compile Include="Managers\ModuleManager.cs" />
     <Compile Include="Modules\HWID.cs" />
     <Compile Include="Modules\Flight.cs" />
