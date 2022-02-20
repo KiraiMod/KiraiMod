@@ -87,6 +87,7 @@ namespace KiraiMod.Managers
         private static void SetupHandlers()
         {
             Stopwatch sw = new();
+            sw.Start();
 
             UserInterface = GUI.transform.Find("UserInterface").gameObject;
 
