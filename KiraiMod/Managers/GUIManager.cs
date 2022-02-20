@@ -110,7 +110,14 @@ namespace KiraiMod.Managers
                     continue;
                 }
 
-                setup.Invoke(null, new object[1] { child });
+                try
+                {
+                    setup.Invoke(null, new object[1] { child });
+                } catch (Exception ex)
+                {
+                    Shared.Logger.LogError($"Setup method for GUI handler {child.name} failed: {ex}");
+                    child.gameObject.active = false;
+                }
             }
 
             UserInterface.active = false;

@@ -9,7 +9,7 @@ using VRC.SDKBase;
 
 namespace KiraiMod.Modules
 {
-    public static class Flight
+    public static class Movement
     {
         public static readonly ConfigEntry<bool> directional = Shared.Config.Bind("Flight", "Directional", false, "Should you move in the direction you are looking");
         public static readonly ConfigEntry<bool> noclip /**/ = Shared.Config.Bind("Flight", "NoClip", false," Should you be able to go through solid objects");
@@ -30,7 +30,7 @@ namespace KiraiMod.Modules
             }
         }
 
-        static Flight()
+        static Movement()
         {
             keybind.RegisterKeybind(() => State ^= true);
             

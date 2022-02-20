@@ -19,14 +19,14 @@ namespace KiraiMod.GUI
 
             Transform Body = self.Find("Body");
 
-            (flight = Body.Find("Flight").GetComponent<Toggle>()).onValueChanged.AddListener(new Action<bool>(state => Modules.Flight.State = state));
-            (directional = Body.Find("Directional").GetComponent<Toggle>()).onValueChanged.AddListener(new Action<bool>(state => Modules.Flight.directional.Value = state));
-            (noclip = Body.Find("NoClip").GetComponent<Toggle>()).onValueChanged.AddListener(new Action<bool>(state => Modules.Flight.noclip.Value = state));
-            (flightSpeed = Body.Find("FlightSpeed").GetKiraiSlider()).slider.onValueChanged.AddListener(new Action<float>(value => Modules.Flight.speed.Value = value));
+            (flight = Body.Find("Flight").GetComponent<Toggle>()).onValueChanged.AddListener(new Action<bool>(state => Modules.Movement.State = state));
+            (directional = Body.Find("Directional").GetComponent<Toggle>()).onValueChanged.AddListener(new Action<bool>(state => Modules.Movement.directional.Value = state));
+            (noclip = Body.Find("NoClip").GetComponent<Toggle>()).onValueChanged.AddListener(new Action<bool>(state => Modules.Movement.noclip.Value = state));
+            (flightSpeed = Body.Find("FlightSpeed").GetKiraiSlider()).slider.onValueChanged.AddListener(new Action<float>(value => Modules.Movement.speed.Value = value));
 
-            Modules.Flight.directional.GUIBind(directional);
-            Modules.Flight.noclip.GUIBind(noclip);
-            Modules.Flight.speed.GUIBind(flightSpeed);
+            Modules.Movement.directional.GUIBind(directional);
+            Modules.Movement.noclip.GUIBind(noclip);
+            Modules.Movement.speed.GUIBind(flightSpeed);
         }
     }
 }
