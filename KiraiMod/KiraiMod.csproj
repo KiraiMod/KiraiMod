@@ -80,18 +80,8 @@
     <Reference Include="UnityEngine.VRModule">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\UnityEngine.VRModule.dll</HintPath>
     </Reference>
-    <Reference Include="VRC.Udon">
-      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\VRChat.BepInEx\BepInEx\unhollowed\VRC.Udon.dll</HintPath>
-    </Reference>
-    <Reference Include="VRC.Udon.Common, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\VRChat.BepInEx\BepInEx\unhollowed\VRC.Udon.Common.dll</HintPath>
-    </Reference>
     <Reference Include="VRCCore-Standalone">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\VRChat.BepInEx\BepInEx\unhollowed\VRCCore-Standalone.dll</HintPath>
-    </Reference>
-    <Reference Include="VRCSDK3">
-      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\VRChat.BepInEx\BepInEx\unhollowed\VRCSDK3.dll</HintPath>
     </Reference>
     <Reference Include="VRCSDKBase">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\VRCSDKBase.dll</HintPath>
@@ -101,7 +91,6 @@
     <Compile Include="Events.cs" />
     <Compile Include="Extensions\Extensions.cs" />
     <Compile Include="Extensions\Fluent.cs" />
-    <Compile Include="GUI\Manipulator.cs" />
     <Compile Include="GUI\Movement.cs" />
     <Compile Include="GUI\Common\Window.cs" />
     <Compile Include="Managers\GUIManager.cs" />
@@ -110,7 +99,6 @@
     <Compile Include="Managers\ModuleManager.cs" />
     <Compile Include="Modules\HWID.cs" />
     <Compile Include="Modules\Movement.cs" />
-    <Compile Include="Modules\Manipulator.cs" />
     <Compile Include="Types\RoomManager.cs" />
     <Compile Include="Utils\CoAsync.cs" />
     <Compile Include="Utils\Coroutine.cs" />
@@ -124,7 +112,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>COPY "..\..\..\KiraiMod.AssetBundles\AssetBundles\StandaloneWindows\kiraimod.gui" "..\..\Lib\KiraiMod.GUI.AssetBundle"
+    <PreBuildEvent>COPY "..\..\..\KiraiMod.AssetBundles\AssetBundles\StandaloneWindows\gui" "..\..\Lib\KiraiMod.GUI.AssetBundle"
 exit /b 0</PreBuildEvent>
   </PropertyGroup>
 </Project>

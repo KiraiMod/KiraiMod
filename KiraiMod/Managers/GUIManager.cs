@@ -72,12 +72,12 @@ namespace KiraiMod.Managers
 
         private static void CreateUI()
         {
-            GUI = bundle.LoadAsset("assets/kiraimod.gui.prefab")
+            (GUI = bundle.LoadAsset("assets/gui.prefab")
                 .Cast<GameObject>()
                 .Instantiate()
-                .DontDestroyOnLoad();
+                .DontDestroyOnLoad()).name = "KiraiMod.GUI";
 
-            GUI.name = "KiraiMod.GUI";
+            UserInterface = GUI.transform.Find("UserInterface").gameObject;
 
             OnLoad?.Invoke();
 
@@ -88,8 +88,6 @@ namespace KiraiMod.Managers
         {
             Stopwatch sw = new();
             sw.Start();
-
-            UserInterface = GUI.transform.Find("UserInterface").gameObject;
 
             Type[] handlers = ModuleManager.Modules["KiraiMod.GUI"];
 
