@@ -7,6 +7,7 @@ using KiraiMod.Managers;
 namespace KiraiMod
 {
     [BepInPlugin("me.kiraihooks.KiraiMod", "KiraiMod", "2.0.0.0")]
+    [BepInDependency("me.kiraihooks.KiraiMod.Core", BepInDependency.DependencyFlags.HardDependency)]
     public class KiraiMod : BasePlugin
     {
         public override void Load()

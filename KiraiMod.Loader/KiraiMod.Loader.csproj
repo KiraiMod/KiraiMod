@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Loader.cs" />
+    <Compile Include="VersionTable.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
