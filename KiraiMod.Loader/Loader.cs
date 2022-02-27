@@ -1,5 +1,6 @@
 ﻿using BepInEx;
 using BepInEx.IL2CPP;
+using BepInEx.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,8 +10,6 @@ using System.Net.Http;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace KiraiMod.Loader
 {
@@ -20,71 +19,27 @@ namespace KiraiMod.Loader
         public const string Server = "https://KiraiHooks.me/KiraiMod/Public/";
         private const string Updater = "KiraiMod.Updater.exe";
 
-        private readonly HttpClient http = new();
-
-        private bool safeLoad;
+        internal static ManualLogSource Logger;
+        internal static HttpClient http = new();
 
         public override void Load()
         {
-            if (!Config.Bind("Updating", "Enabled", true, "Should the loader attempt to auto update").Value) return;
-            safeLoad = Config.Bind("Updating", "Safe", false, "Updating will halt if the server cannot be contacted").Value;
-            bool slowLoad = Config.Bind("Updating", "Slow", false, "Enabling will prevent the process from moving forward until the server responds").Value;
+            Logger = Log;
 
-            Task<string> task = http.GetStringAsync(Server + "Info");
-            task.ContinueWith(ProcessInfo);
+            if (Config.Bind("Updating", "Enabled", true, "Should the loader attempt to auto update").Value)
+                VersionTable.OnFetched += UpdateFiles;
 
-            if (slowLoad) task.Wait();
+            VersionTable.Fetch(
+                Config.Bind("Updating", "Safe", false, "Updating will halt if the server cannot be contacted").Value,
+                Config.Bind("Updating", "Slow", false, "Enabling will prevent the process from moving forward until the server responds").Value
+            );
         }
 
-        private void ProcessInfo(Task<string> task)
+        private void UpdateFiles(Dictionary<string, string> table)
         {
-            if (task.IsFaulted)
-            {
-                Log.LogError(task.Exception);
-                if (safeLoad)
-                {
-                    Log.LogFatal($"Failed to contact the server and SafeLoad was enabled");
-                    Process.GetCurrentProcess().Kill();
-                    Environment.Exit(0);
-                    for (; ; );
-                }
-                else Log.LogWarning("Unable to contact the remote server for updates");
-                return;
-            }
-
-#if DEBUG
-            Log.LogDebug("Resolving version table");
-#endif
-            Dictionary<string, string> table = task.Result.ToCharArray()
-                .Where(x => !char.IsUpper(x))
-                .Select((chr, index) => (chr, index))
-                .GroupBy(x => x.index / 128, x => x.chr)
-                .Select(x => string.Join("", x.ToArray()))
-                .ToDictionary(x => x.Substring(0, 64), x => x.Substring(64));
-
             string cd = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/";
-            List<string> toUpdate = new();
-
-#if DEBUG
-            Log.LogDebug("Enumerating files");
-#endif
-            Directory.EnumerateFiles(cd, "KiraiMod.*")
-                .Select(x => (x, SHA256(Encoding.UTF8.GetBytes(Path.GetFileName(x) + ".hash"))))
-                .Where(x => table.ContainsKey(x.Item2))
-                .Select(x => (x.x, SHA256(File.ReadAllBytes(x.x)), table[x.Item2]))
-                .Where(x => x.Item2 != x.Item3)
-                .ToList()
-                .ForEach(data =>
-                {
-                    string fname = Path.GetFileName(data.x);
-#if DEBUG
-                    Log.LogDebug("Updating " + fname);
-#endif
-                    if (fname == Updater) File.WriteAllBytes(data.x, http.GetByteArrayAsync(Server + fname).Result);
-                    else toUpdate.Add(fname);
-                });
-
-            if (toUpdate.Count > 0)
+            string[] toUpdate = FetchOutOfDate(table, cd);
+            if (toUpdate.Length > 0)
             {
                 if (!File.Exists(cd + Updater))
                     File.WriteAllBytes(cd + Updater, http.GetByteArrayAsync(Server + Updater).Result);
@@ -93,6 +48,26 @@ namespace KiraiMod.Loader
                 Process.GetCurrentProcess().Kill();
             }
         }
+
+        private string[] FetchOutOfDate(Dictionary<string, string> table, string cd) => 
+            Directory.EnumerateFiles(cd, "KiraiMod.*")
+                .Select(x => (x, SHA256(Encoding.UTF8.GetBytes(Path.GetFileName(x) + ".hash"))))
+                .Where(x => table.ContainsKey(x.Item2))
+                .Select(x => (x.x, SHA256(File.ReadAllBytes(x.x)), table[x.Item2]))
+                .Where(x =>
+                {
+                    if (x.Item2 == x.Item3) return false;
+
+                    string fname = Path.GetFileName(x.x);
+                    if (fname != Updater) return true;
+                    else
+                    {
+                        File.WriteAllBytes(x.x, http.GetByteArrayAsync(Server + fname).Result);
+                        return false;
+                    }
+                })
+                .Select(x => Path.GetFileName(x.x))
+                .ToArray();
 
         private string SHA256(byte[] bytes) => string.Join("", new SHA256Managed().ComputeHash(bytes).Select(x => string.Format("{0:x2}", x)).ToArray());
     }
