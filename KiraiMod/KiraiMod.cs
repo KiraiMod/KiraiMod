@@ -1,4 +1,4 @@
-﻿global using Object = UnityEngine.Object;
+﻿global using KiraiMod.Core;
 
 using BepInEx;
 using BepInEx.IL2CPP;
@@ -14,8 +14,6 @@ namespace KiraiMod
             Shared.Logger = Log;
             Shared.Config = Config;
             Shared.Harmony = new("me.kiraihooks.KiraiMod");
-
-            typeof(Events).Initialize();
 
             typeof(KeybindManager).Initialize();
             typeof(ModuleManager).Initialize();
