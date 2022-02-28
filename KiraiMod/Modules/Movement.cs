@@ -1,6 +1,5 @@
 ﻿using BepInEx.Configuration;
 using HarmonyLib;
-using KiraiMod.Managers;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -32,7 +31,7 @@ namespace KiraiMod.Modules
 
         static Movement()
         {
-            keybind.RegisterKeybind(() => State ^= true);
+            keybind.Register(() => State ^= true);
 
             noclip.SettingChanged += (sender, args) => Collisions.Set(noclip.Value);
             directional.SettingChanged += (sender, args) => Target.Fetch();

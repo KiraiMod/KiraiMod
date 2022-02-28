@@ -44,7 +44,7 @@ namespace KiraiMod.Managers
         {
             Events.UIManagerLoaded += OnUIManagerLoaded;
 
-            Shared.Config.Bind("GUI", "Keybind", new Key[] { Key.RightShift }, "The keybind you want to use to open the GUI").RegisterKeybind(() => Showing ^= true);
+            Shared.Config.Bind("GUI", "Keybind", new Key[] { Key.RightShift }, "The keybind you want to use to open the GUI").Register(() => Showing ^= true);
         }
 
         private static void OnUIManagerLoaded()
