@@ -89,7 +89,7 @@ namespace KiraiMod.Managers
             Stopwatch sw = new();
             sw.Start();
 
-            Type[] handlers = ModuleManager.Modules["KiraiMod.GUI"];
+            Type[] handlers = ModuleManager.Modules["GUI"];
 
             for (int i = 0; i < UserInterface.transform.childCount; i++)
             {

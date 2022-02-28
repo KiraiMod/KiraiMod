@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace KiraiMod.Managers
 {
@@ -16,7 +17,7 @@ namespace KiraiMod.Managers
         {
             Register(Assembly.GetExecutingAssembly());
 
-            foreach (Type module in Modules["KiraiMod.Modules"])
+            foreach (Type module in Modules["Modules"])
                 if (!module.IsNested)
                     module.Initialize();
         }
@@ -24,9 +25,11 @@ namespace KiraiMod.Managers
         public static void Register() => Register(Assembly.GetCallingAssembly());
         public static void Register(Assembly assembly)
         {
+            Regex r = new($"^{assembly.GetName().Name}[.]?");
+
             Dictionary<string, Type[]> module = assembly.GetExportedTypes()
                 .GroupBy(x => x.Namespace)
-                .ToDictionary(x => x.Key, x => x.ToArray());
+                .ToDictionary(x => r.Replace(x.Key, ""), x => x.ToArray());
 
             module.ToList()
                 .ForEach(x =>
