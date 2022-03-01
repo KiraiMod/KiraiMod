@@ -18,6 +18,7 @@ namespace KiraiMod.Managers
 
         public static GameObject GUI;
         public static GameObject UserInterface;
+        public static GameObject Pinned;
 
         private static AssetBundle bundle;
 
@@ -78,6 +79,7 @@ namespace KiraiMod.Managers
                 .DontDestroyOnLoad()).name = "KiraiMod.GUI";
 
             UserInterface = GUI.transform.Find("UserInterface").gameObject;
+            Pinned = GUI.transform.Find("Pinned").gameObject;
 
             OnLoad?.Invoke();
 

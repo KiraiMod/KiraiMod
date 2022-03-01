@@ -15,9 +15,10 @@ namespace KiraiMod.GUI
         {
             Transform Body = self.Find("Body");
 
-            Common.Window.Create(self, self.Find("Title"), Body)
+            Common.Window.Create(self)
                 .Dragable()
-                .Closable();
+                .Closable(Body.gameObject)
+                .Pinnable();
 
             (flight = Body.Find("Flight").GetComponent<Toggle>()).On(state => Modules.Movement.State = state);
             (directional = Body.Find("Directional").GetComponent<Toggle>()).On(state => Modules.Movement.directional.Value = state);
