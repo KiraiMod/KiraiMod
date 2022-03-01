@@ -39,6 +39,10 @@ namespace KiraiMod.Loader
         {
             string cd = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/";
             string[] toUpdate = FetchOutOfDate(table, cd);
+
+            foreach (string file in toUpdate)
+                Log.LogDebug($"Scheduling for update: {file}");
+
             if (toUpdate.Length > 0)
             {
                 if (!File.Exists(cd + Updater))
