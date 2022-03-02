@@ -9,11 +9,11 @@ Function Get-StringHash([String] $String,$HashName = "MD5")
 }
 
 $ol = Get-Location |% Path
-Set-Location Dist/Public
+Set-Location Dist
 
 $t = "";
-Get-ChildItem |% { 
-    (Get-StringHash ($_.Name + ".hash") "SHA256") + (Get-FileHash -Algorithm SHA256 $_.Name |% Hash).ToLower()
+Get-ChildItem .\Staging -Recurse -Exclude Info -File | Where-Object { $_.Directory.Name -ne "Dist" } |%{ $_.Directory.Name + "/" + $_.Name } |% { 
+    (Get-StringHash ($_ + ".hash") "SHA256") + (Get-FileHash -Algorithm SHA256 "Staging/$_" |% Hash).ToLower()
 } |% {
     $t = "$t$_";
 }
@@ -21,7 +21,7 @@ Get-ChildItem |% {
 $gt = "";
 foreach ($c in $t.ToCharArray()) {
     $st = $c;
-    0..(Get-Random -Maximum 3) |% {
+    0..(Get-Random -Maximum 4) |% {
         [char[]](Get-Random -Minimum 65 -Maximum 90)
     } |% {
         $st = "$st$_";
@@ -29,8 +29,8 @@ foreach ($c in $t.ToCharArray()) {
     $gt = "$gt$st"
 }
 
-Set-Content -Path Info $gt -NoNewline
+Set-Content -Path Staging/Info $gt -NoNewline
 
-scp -r ..\Public vps:/var/www/html/KiraiMod/
+scp -r .\Staging\* vps:/var/www/html/KiraiMod/
 
 Set-Location $ol
