@@ -1,16 +1,22 @@
 <Project>
 	<Target Name="BuildScripts" AfterTargets="PostBuildEvent">
 		<Exec Command='
-			IF EXIST "$(TargetDir)..\..\..\.private" ( exit ) 
-			MKDIR "C:/Program Files (x86)/Steam/steamapps/common/VRChat.BepInEx/BepInEx/Plugins/KiraiMod"
-			COPY "$(TargetPath)" "C:/Program Files (x86)/Steam/steamapps/common/VRChat.BepInEx/BepInEx/Plugins/KiraiMod" > NUL
+			IF NOT EXIST "C:/Program Files (x86)/Steam/steamapps/common/VRChat.BepInEx/BepInEx/Plugins/KiraiMod" (
+				MKDIR "C:/Program Files (x86)/Steam/steamapps/common/VRChat.BepInEx/BepInEx/Plugins/KiraiMod"
+			)
+
+			IF NOT EXIST "C:/Program Files (x86)/Steam/steamapps/common/VRChat.BepInEx/BepInEx/Plugins/KiraiMod/Extensions" (
+				MKDIR "C:/Program Files (x86)/Steam/steamapps/common/VRChat.BepInEx/BepInEx/Plugins/KiraiMod/Extensions"
+			)
+
+			IF EXIST "$(TargetDir)..\..\.extension" (
+				COPY "$(TargetPath)" "C:/Program Files (x86)/Steam/steamapps/common/VRChat.BepInEx/BepInEx/Plugins/KiraiMod/Extensions" > NUL
+			) ELSE COPY "$(TargetPath)" "C:/Program Files (x86)/Steam/steamapps/common/VRChat.BepInEx/BepInEx/Plugins/KiraiMod" > NUL
 
 			IF "$(ConfigurationName)" == "Release" (
 				MKDIR "$(SolutionDir)\Dist"
 				COPY "$(TargetPath)" "$(SolutionDir)\Dist" > NUL
 			)
-
-			cmd /c "exit /b 0"
 		'/>
     </Target>
 </Project>

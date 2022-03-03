@@ -130,6 +130,11 @@ namespace KiraiMod.Managers
 
         public static void GUIBind(this ConfigEntry<bool> entry, Toggle toggle) => entry.SettingChanged += ((EventHandler)((sender, args) => toggle.Set(entry.Value, false))).Invoke();
         public static void GUIBind(this ConfigEntry<float> entry, KiraiSlider toggle) => entry.SettingChanged += ((EventHandler)((sender, args) => toggle.slider.Set(entry.Value))).Invoke();
+        public static void GUIBindFull(this ConfigEntry<bool> entry, Toggle toggle)
+        {
+            entry.GUIBind(toggle);
+            toggle.On(state => entry.Value = state);
+        }
 
         public class KiraiSlider
         {
