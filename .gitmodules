@@ -1,0 +1,4 @@
+[submodule "KiraiMod.Updater"]
+	path = KiraiMod.Updater
+	url = git@gitlab.com:KiraiMod/Updater.git
+	branch = master

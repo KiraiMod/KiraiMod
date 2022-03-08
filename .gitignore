@@ -1,3 +1,5 @@
+Build/
+DebugBuild/
 Dist/
 
 ## Ignore Visual Studio temporary files, build results, and

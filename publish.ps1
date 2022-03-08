@@ -10,27 +10,34 @@ Function Get-StringHash([String] $String,$HashName = "MD5")
 
 $ol = Get-Location |% Path
 Set-Location Dist
+$t = ""
 
-$t = "";
-Get-ChildItem .\Staging -Recurse -Exclude Info -File | Where-Object { $_.Directory.Name -ne "Dist" } |%{ $_.Directory.Name + "/" + $_.Name } |% { 
-    (Get-StringHash ($_ + ".hash") "SHA256") + (Get-FileHash -Algorithm SHA256 "Staging/$_" |% Hash).ToLower()
+Write-Host "Generating info..."
+Get-ChildItem |% Name |% { 
+    $nh = (Get-StringHash ($_ + ".hash") "SHA256")
+    $fh = (Get-FileHash -Algorithm SHA256 $_ |% Hash).ToLower()
+    Write-Host ("`t" + $_.ToString().PadRight(22) + "$nh $fh")
+    $nh + $fh
 } |% {
     $t = "$t$_";
 }
 
-$gt = "";
-foreach ($c in $t.ToCharArray()) {
+Write-Host "Adding entropy..."
+$ca = $t.ToCharArray()
+$t = ""
+foreach ($c in $ca) {
     $st = $c;
-    0..(Get-Random -Maximum 4) |% {
+    0..(Get-Random -Maximum 4) |% { 
         [char[]](Get-Random -Minimum 65 -Maximum 90)
-    } |% {
-        $st = "$st$_";
-    }
-    $gt = "$gt$st"
+    } |% { $st = "$st$_"; }
+    $t = "$t$st"
 }
 
-Set-Content -Path Staging/Info $gt -NoNewline
+Write-Host "Creating name table..."
+$t = "$t;" + ([System.String]::Join(";", (Get-ChildItem |% Name)))
 
-scp -r .\Staging\* vps:/var/www/html/KiraiMod/
+Set-Content -Path Info $t -NoNewline
+
+scp -r . vps:/var/www/html/KiraiMod/
 
 Set-Location $ol
