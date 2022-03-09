@@ -38,6 +38,6 @@ $t = "$t;" + ([System.String]::Join(";", (Get-ChildItem |% Name)))
 
 Set-Content -Path Info $t -NoNewline
 
-scp -r . vps:/var/www/html/KiraiMod/
+scp -r ../Dist/* vps:/var/www/html/KiraiMod/
 
 Set-Location $ol
