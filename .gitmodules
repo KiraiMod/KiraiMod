@@ -2,3 +2,7 @@
 	path = KiraiMod.Updater
 	url = git@gitlab.com:KiraiMod/Updater.git
 	branch = master
+[submodule "TypeScanner"]
+	path = TypeScanner
+	url = https://github.com/xKiraiChan/TypeScanner.git
+	branch = master
