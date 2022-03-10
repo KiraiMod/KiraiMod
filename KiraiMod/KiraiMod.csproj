@@ -80,6 +80,9 @@
     <Reference Include="UnityEngine.VRModule">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\UnityEngine.VRModule.dll</HintPath>
     </Reference>
+    <Reference Include="VRC.Udon.VRCWrapperModules">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\VRChat.BepInEx\BepInEx\unhollowed\VRC.Udon.VRCWrapperModules.dll</HintPath>
+    </Reference>
     <Reference Include="VRCCore-Standalone">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\VRChat.BepInEx\BepInEx\unhollowed\VRCCore-Standalone.dll</HintPath>
     </Reference>
@@ -97,6 +100,7 @@
     <Compile Include="Modules\ForceClone.cs" />
     <Compile Include="Modules\HWID.cs" />
     <Compile Include="Modules\Movement.cs" />
+    <Compile Include="Modules\Pickups.cs" />
     <Compile Include="Shared.cs" />
   </ItemGroup>
   <ItemGroup>
