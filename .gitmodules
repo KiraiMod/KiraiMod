@@ -6,3 +6,7 @@
 	path = TypeScanner
 	url = https://github.com/xKiraiChan/TypeScanner.git
 	branch = master
+[submodule "KiraiMod.Moderations"]
+	path = KiraiMod.Moderations
+	url = git@gitlab.com:KiraiMod/moderations.git
+	branch = master

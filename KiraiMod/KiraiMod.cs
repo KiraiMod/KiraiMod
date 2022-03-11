@@ -19,8 +19,8 @@ namespace KiraiMod
             typeof(ModuleManager).Initialize();
             typeof(GUIManager).Initialize();
 
-            Events.PlayerJoined += player => Log.LogMessage($"<color=#ccf>{player.APIUser.displayName}</color> joined");
-            Events.PlayerLeft += player => Log.LogMessage($"<color=#ccf>{player.APIUser.displayName}</color> left");
+            Events.PlayerJoined += player => Log.LogMessage($"{player.APIUser.displayName} joined");
+            Events.PlayerLeft += player => Log.LogMessage($"{player.APIUser.displayName} left");
         }
     }
 }

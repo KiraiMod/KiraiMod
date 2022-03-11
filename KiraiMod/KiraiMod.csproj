@@ -97,6 +97,7 @@
     <Compile Include="Managers\GUIManager.cs" />
     <Compile Include="KiraiMod.cs" />
     <Compile Include="Managers\ModuleManager.cs" />
+    <Compile Include="Managers\WorldManager.cs" />
     <Compile Include="Modules\ForceClone.cs" />
     <Compile Include="Modules\HWID.cs" />
     <Compile Include="Modules\Movement.cs" />
