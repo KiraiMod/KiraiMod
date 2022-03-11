@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace KiraiMod.Modules
 {
-    internal class ForceClone
+    public static class ForceClone
     {
         public static ConfigEntry<bool> Enabled = Shared.Config.Bind("ForceClone", "Enabled", true, "Force a user to allow you to clone their avatar if it is public");
 
@@ -21,6 +21,7 @@ namespace KiraiMod.Modules
                 if (_state == value) return;
                 _state = value;
 
+                Shared.Logger.LogInfo("Hooking!: " + value);
                 if (value) hook = Shared.Harmony.Patch(original, target);
                 else Shared.Harmony.Unpatch(original, hook);
             }

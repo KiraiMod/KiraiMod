@@ -17,7 +17,10 @@ namespace KiraiMod
             Shared.Harmony = new("me.kiraihooks.KiraiMod");
 
             typeof(ModuleManager).Initialize();
-            typeof(GUIManager).Initialize(); 
+            typeof(GUIManager).Initialize();
+
+            Events.PlayerJoined += player => Log.LogMessage($"<color=#ccf>{player.APIUser.displayName}</color> joined");
+            Events.PlayerLeft += player => Log.LogMessage($"<color=#ccf>{player.APIUser.displayName}</color> left");
         }
     }
 }
