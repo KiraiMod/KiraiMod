@@ -94,6 +94,7 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="GUI\Movement.cs" />
     <Compile Include="GUI\Common\Window.cs" />
+    <Compile Include="GUI\Players.cs" />
     <Compile Include="Managers\GUIManager.cs" />
     <Compile Include="KiraiMod.cs" />
     <Compile Include="Managers\ModuleManager.cs" />
@@ -102,6 +103,7 @@
     <Compile Include="Modules\HWID.cs" />
     <Compile Include="Modules\Movement.cs" />
     <Compile Include="Modules\Pickups.cs" />
+    <Compile Include="Modules\Players.cs" />
     <Compile Include="Shared.cs" />
   </ItemGroup>
   <ItemGroup>
