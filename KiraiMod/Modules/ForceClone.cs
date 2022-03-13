@@ -21,7 +21,6 @@ namespace KiraiMod.Modules
                 if (_state == value) return;
                 _state = value;
 
-                Shared.Logger.LogInfo("Hooking!: " + value);
                 if (value) hook = Shared.Harmony.Patch(original, target);
                 else Shared.Harmony.Unpatch(original, hook);
             }
