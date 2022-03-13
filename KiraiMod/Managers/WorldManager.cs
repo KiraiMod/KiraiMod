@@ -12,12 +12,14 @@ namespace KiraiMod.Managers
         public static readonly List<(string, Type)> WorldIDMods = new();
         public static List<object> LoadedWorldMods = new();
 
-        static WorldManager() => Events.WorldLoaded += OnWorldLoaded;
+        static WorldManager()
+        {
+            Events.WorldLoaded += OnWorldLoaded;
+            Events.WorldUnloaded += OnWorldUnloaded;
+        }
 
         private static void OnWorldLoaded(Scene scene)
         {
-            LoadedWorldMods.Clear();
-
             ApiWorldInstance current = Core.Types.RoomManager.GetCurrentWorld();
 
             LoadedWorldMods = SceneNameMods.Where(x => x.Item1 == scene.name)
@@ -36,5 +38,7 @@ namespace KiraiMod.Managers
                 .Where(x => x != null)
                 .ToList();
         }
+
+        private static void OnWorldUnloaded(Scene scene) => LoadedWorldMods.Clear();
     }
 }
