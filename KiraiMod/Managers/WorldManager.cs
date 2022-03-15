@@ -10,7 +10,7 @@ namespace KiraiMod.Managers
     {
         public static readonly List<(string, Type)> SceneNameMods = new();
         public static readonly List<(string, Type)> WorldIDMods = new();
-        public static List<object> LoadedWorldMods = new();
+        public static object[] LoadedWorldMods;
 
         static WorldManager()
         {
@@ -36,9 +36,9 @@ namespace KiraiMod.Managers
                     }
                 })
                 .Where(x => x != null)
-                .ToList();
+                .ToArray();
         }
 
-        private static void OnWorldUnloaded(Scene scene) => LoadedWorldMods.Clear();
+        private static void OnWorldUnloaded(Scene scene) => LoadedWorldMods = null;
     }
 }
