@@ -128,29 +128,38 @@ namespace KiraiMod.Managers
             Shared.Logger.LogInfo($"Setup GUI in {sw.Elapsed.Milliseconds} ms");
         }
 
-        public static void GUIBind(this ConfigEntry<bool> entry, Toggle toggle) => entry.SettingChanged += ((EventHandler)((sender, args) => toggle.Set(entry.Value, false))).Invoke();
-        public static void GUIBind(this ConfigEntry<float> entry, KiraiSlider toggle) => entry.SettingChanged += ((EventHandler)((sender, args) => toggle.slider.Set(entry.Value))).Invoke();
-        public static void GUIBindFull(this ConfigEntry<bool> entry, Toggle toggle)
+        public static void GUIBind(this ConfigEntry<bool> entry, Toggle toggle)
         {
-            entry.GUIBind(toggle);
+            entry.SettingChanged += ((EventHandler)((sender, args) => toggle.Set(entry.Value, false))).Invoke();
             toggle.On(state => entry.Value = state);
         }
 
-        public class KiraiSlider
+        public static void GUIBind(this ConfigEntry<float> entry, BoundSlider slider)
+        {
+            entry.SettingChanged += ((EventHandler)((sender, args) => slider.slider.Set(entry.Value))).Invoke();
+            slider.slider.On(state => entry.Value = state);
+        }
+
+        public class BoundSlider
         {
             public Text text;
             public Slider slider;
 
-            public KiraiSlider(Transform obj)
+            public static BoundSlider Create(Transform obj) => Create(obj.GetComponent<Slider>(), obj.GetComponent<Text>());
+
+            public static BoundSlider Create(Slider slider, Text text)
             {
-                text = obj.GetComponent<Text>();
-                slider = obj.GetComponent<Slider>();
+                BoundSlider s = new();
+                s.slider = slider;
+                s.text = text;
 
                 if (text != null)
                 {
                     string format = text.text;
                     slider.onValueChanged.AddListener(new Action<float>(value => text.text = string.Format(format, value)));
                 }
+
+                return s;
             }
         }
     }

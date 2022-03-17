@@ -1,5 +1,6 @@
 ﻿using BepInEx.Configuration;
 using HarmonyLib;
+using KiraiMod.Core.Utils;
 using System;
 using System.Reflection;
 using UnityEngine;
@@ -11,50 +12,114 @@ namespace KiraiMod.Modules
 {
     public static class Pickups
     {
-        private static readonly HarmonyMethod NoOp = typeof(Pickups).GetMethod(nameof(HkNoOp)).ToHM();
+        private static readonly HarmonyMethod NoOp = typeof(Pickups).GetMethod(nameof(HkNoOp), BindingFlags.NonPublic | BindingFlags.Static).ToHM();
 
         static Pickups()
         {
-            typeof(Throwing).Initialize();
-            typeof(Theft).Initialize();
-            typeof(Orbit).Initialize();
+            typeof(Modifiers).Initialize();
+        }
+
+        public static class Modifiers
+        {
+            public static ConfigEntry<bool> unlock = Shared.Config.Bind("Pickups", "Unlock", false, "Should all pickups always pickupable");
+            public static ConfigEntry<bool> theft = Shared.Config.Bind("Pickups", "Theft", false, "Should you be able to take things out of people's hands");
+            public static ConfigEntry<bool> rotate = Shared.Config.Bind("Pickups", "Rotate", false, "Shoud you be able to rotate all pickups in your hand");
+            public static ConfigEntry<bool> reach = Shared.Config.Bind("Pickups", "Reach", false, "Should you be able to pickup things from any distance");
+            public static ConfigEntry<bool> boost = Shared.Config.Bind("Pickups", "Boost", false, "Should you be able to throw things faster");
+            public static ConfigEntry<float> boostSpeed = Shared.Config.Bind("Pickups", "BoostSpeed", 5.0f, "The speed at which pickups are thrown");
+
+            static Modifiers()
+            {
+                Type type = typeof(ExternVRCSDK3ComponentsVRCPickup);
+                new BasePickupModifier(type.GetMethod(nameof(ExternVRCSDK3ComponentsVRCPickup.__set_pickupable__SystemBoolean)), unlock, pickup => pickup.pickupable = true);
+                new BasePickupModifier(type.GetMethod(nameof(ExternVRCSDK3ComponentsVRCPickup.__set_DisallowTheft__SystemBoolean)), theft, pickup => pickup.DisallowTheft = false);
+                new BasePickupModifier(type.GetMethod(nameof(ExternVRCSDK3ComponentsVRCPickup.__set_allowManipulationWhenEquipped__SystemBoolean)), rotate, pickup => pickup.allowManipulationWhenEquipped = true);
+                new BasePickupModifier(type.GetMethod(nameof(ExternVRCSDK3ComponentsVRCPickup.__set_proximity__SystemSingle)), reach, pickup => pickup.proximity = float.MaxValue);
+                new BasePickupModifier(type.GetMethod(nameof(ExternVRCSDK3ComponentsVRCPickup.__set_ThrowVelocityBoostScale__SystemSingle)), boost, pickup => pickup.ThrowVelocityBoostScale = boostSpeed.Value);
+
+                boostSpeed.SettingChanged += (sender, args) =>
+                {
+                    if (boost.Value)
+                        foreach (VRC_Pickup pickup in UnityEngine.Object.FindObjectsOfType<VRC_Pickup>())
+                            pickup.ThrowVelocityBoostScale = boostSpeed.Value;
+                };
+
+                Shared.Harmony.Patch(
+                    typeof(VRC_Pickup).GetMethod(nameof(VRC_Pickup.Awake)),
+                    typeof(Modifiers).GetMethod(nameof(HookAwake), BindingFlags.NonPublic | BindingFlags.Static).ToHM()
+                );
+            }
+
+            private static void HookAwake(ref VRC_Pickup __instance)
+            {
+                if (unlock.Value) __instance.pickupable = true;
+                if (theft.Value) __instance.DisallowTheft = false;
+                if (rotate.Value) __instance.allowManipulationWhenEquipped = true;
+                if (reach.Value) __instance.proximity = float.MaxValue;
+                if (boost.Value) __instance.ThrowVelocityBoostScale = boostSpeed.Value;
+            }
+
+            public class BasePickupModifier
+            {
+                private MethodInfo hook;
+                private readonly Action<VRC_Pickup> setup;
+
+                public BasePickupModifier(MethodInfo orig, ConfigEntry<bool> entry, Action<VRC_Pickup> setup)
+                {
+                    this.setup = setup;
+                    entry.SettingChanged += ((EventHandler)((sender, args) =>
+                    {
+                        if (theft.Value)
+                        {
+                            Events.WorldLoaded += OnWorldLoaded;
+                            foreach (VRC_Pickup pickup in UnityEngine.Object.FindObjectsOfType<VRC_Pickup>())
+                                setup(pickup);
+                            hook = Shared.Harmony.Patch(orig, NoOp);
+                        }
+                        else
+                        {
+                            Events.WorldLoaded -= OnWorldLoaded;
+                            Shared.Harmony.Unpatch(orig, hook);
+                        }
+                    })).Invoke();
+                }
+
+                private void OnWorldLoaded(Scene scene)
+                {
+                    foreach (VRC_Pickup pickup in UnityEngine.Object.FindObjectsOfType<VRC_Pickup>())
+                        setup(pickup);
+                }
+            }
         }
 
         public static class Orbit
         {
-            public static ConfigEntry<bool> Enabled = Shared.Config.Bind("Pickups", "Orbit", false);
             public static ConfigEntry<float> Speed = Shared.Config.Bind("Pickups", "OrbitSpeed", 1f, "How fast the items complete a full revolution around the target");
             public static ConfigEntry<float> Distance = Shared.Config.Bind("Pickups", "OrbitDitance", 1f, "How far the items should be from the target");
+            public static ConfigEntry<float> Offset = Shared.Config.Bind("Pickups", "OrbitOffset", 0f, "How much the items should be above or below the target");
 
-            public static bool _state;
-            public static bool State
+            public static Bound<bool> State = new();
+
+            private static VRC_Pickup[] pickups;
+
+            static Orbit()
             {
-                set
+                State.ValueChanged += value =>
                 {
-                    if (_state == value) return;
-                    _state = value;
-
                     if (value)
                     {
                         pickups = UnityEngine.Object.FindObjectsOfType<VRC_Pickup>();
                         Events.Update += Update;
                     }
                     else Events.Update -= Update;
-                }
-            }
-
-            private static VRC_Pickup[] pickups;
-
-            static Orbit()
-            {
-                Enabled.SettingChanged += (sender, args) => State = Enabled.Value;
+                };
             }
 
             private static void Update()
             {
-                if (Players.Target is null)
+                if (Players.Target == null)
                 {
-                    State = false;
+                    State.Value = false;
                     return;
                 }
 
@@ -70,83 +135,10 @@ namespace KiraiMod.Modules
                     if (Networking.GetOwner(pickup.gameObject) != Networking.LocalPlayer)
                         Networking.SetOwner(Networking.LocalPlayer, pickup.gameObject);
 
-                    pickup.transform.position = 
-                        Players.Target.VRCPlayerApi.gameObject.transform.position 
-                        + new Vector3(Mathf.Sin(Time.time * Speed.Value + degrees * i) * Distance.Value, 0, Mathf.Cos(Time.time * Speed.Value + degrees * i) * Distance.Value);
+                    pickup.transform.position =
+                        Players.Target.VRCPlayerApi.gameObject.transform.position
+                        + new Vector3(Mathf.Sin(Time.time * Speed.Value + degrees * i) * Distance.Value, Offset.Value, Mathf.Cos(Time.time * Speed.Value + degrees * i) * Distance.Value);
                 }
-            }
-        }
-
-        public static class Theft
-        {
-            public static ConfigEntry<bool> Enabled = Shared.Config.Bind("Pickups", "Theft", true, "Should you be able to take pickups out of other people's hands");
-
-            private static readonly MethodInfo orig = typeof(ExternVRCSDK3ComponentsVRCPickup).GetMethod(nameof(ExternVRCSDK3ComponentsVRCPickup.__set_DisallowTheft__SystemBoolean));
-            private static MethodInfo hook;
-
-            static Theft() =>
-                Enabled.SettingChanged += ((EventHandler)((sender, args) =>
-                {
-                    if (Enabled.Value)
-                    {
-                        Events.WorldLoaded += OnWorldLoaded;
-                        SetAll();
-                        hook = Shared.Harmony.Patch(orig, NoOp);
-                    }
-                    else
-                    {
-                        Events.WorldLoaded -= OnWorldLoaded;
-                        Shared.Harmony.Unpatch(orig, hook);
-                    }
-                })).Invoke();
-
-            private static void OnWorldLoaded(Scene scene) => SetAll();
-            private static void SetAll()
-            {
-                foreach (VRC_Pickup pickup in UnityEngine.Object.FindObjectsOfType<VRC_Pickup>())
-                    pickup.DisallowTheft = false;
-            }
-        }
-
-        public static class Throwing
-        {
-            public static ConfigEntry<bool> Enabled = Shared.Config.Bind("Pickups", "Throwing", true, "Should pickup throw speed be modified");
-            public static ConfigEntry<float> Speed = Shared.Config.Bind("Pickups", "ThrowSpeed", 5.0f, "The speed at which pickups are thrown");
-
-            private static readonly MethodInfo orig = typeof(ExternVRCSDK3ComponentsVRCPickup).GetMethod(nameof(ExternVRCSDK3ComponentsVRCPickup.__set_ThrowVelocityBoostScale__SystemSingle));
-            private static MethodInfo hook;
-
-            static Throwing()
-            {
-                Enabled.SettingChanged += ((EventHandler)((sender, args) => {
-                    if (Enabled.Value)
-                    {
-                        Events.WorldLoaded += OnWorldLoaded;
-                        SetAll();
-                        hook = Shared.Harmony.Patch(orig, NoOp);
-                    }
-                    else
-                    {
-                        Events.WorldLoaded -= OnWorldLoaded;
-                        Shared.Harmony.Unpatch(orig, hook);
-                    }
-                })).Invoke();
-
-                Speed.SettingChanged += (sender, args) =>
-                {
-                    if (!Enabled.Value) return;
-                    float speed = Speed.Value;
-                    foreach (VRC_Pickup pickup in UnityEngine.Object.FindObjectsOfType<VRC_Pickup>())
-                        pickup.ThrowVelocityBoostScale = speed;
-                };
-            }
-
-            private static void OnWorldLoaded(Scene scene) => SetAll();
-            private static void SetAll()
-            {
-                float speed = Speed.Value;
-                foreach (VRC_Pickup pickup in UnityEngine.Object.FindObjectsOfType<VRC_Pickup>())
-                    pickup.ThrowVelocityBoostScale = speed;
             }
         }
 

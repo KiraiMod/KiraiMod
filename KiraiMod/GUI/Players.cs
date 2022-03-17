@@ -10,6 +10,7 @@ namespace KiraiMod.GUI
         public static Player Current;
 
         public static Text Total;
+        public static AudioSource LeaveSound;
 
         private static GameObject Template;
 

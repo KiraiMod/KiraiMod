@@ -9,7 +9,7 @@ namespace KiraiMod.GUI
         public static Toggle flight;
         public static Toggle directional;
         public static Toggle noclip;
-        public static KiraiSlider flightSpeed;
+        public static BoundSlider flightSpeed;
 
         public static void Setup(Transform self)
         {
@@ -20,10 +20,10 @@ namespace KiraiMod.GUI
                 .Closable(Body.gameObject)
                 .Pinnable();
 
-            (flight = Body.Find("Flight").GetComponent<Toggle>()).On(state => Modules.Movement.State = state);
-            (directional = Body.Find("Directional").GetComponent<Toggle>()).On(state => Modules.Movement.directional.Value = state);
-            (noclip = Body.Find("NoClip").GetComponent<Toggle>()).On(state => Modules.Movement.noclip.Value = state);
-            (flightSpeed = Body.Find("FlightSpeed").GetKiraiSlider()).slider.On(value => Modules.Movement.speed.Value = value);
+            Modules.Movement.state.Bind(flight = Body.Find("Flight").GetComponent<Toggle>());
+            Modules.Movement.directional.GUIBind(directional = Body.Find("Directional").GetComponent<Toggle>());
+            Modules.Movement.noclip.GUIBind(noclip = Body.Find("NoClip").GetComponent<Toggle>());
+            Modules.Movement.speed.GUIBind(flightSpeed = BoundSlider.Create(Body.Find("FlightSpeed")));
             Body.Find("Locomotion").GetComponent<Button>().On(Modules.Movement.UseLegacyLocomotion);
             Body.Find("Position/Save").GetComponent<Button>().On(Modules.Movement.SavePosition);
             Body.Find("Position/Load").GetComponent<Button>().On(Modules.Movement.LoadPosition);

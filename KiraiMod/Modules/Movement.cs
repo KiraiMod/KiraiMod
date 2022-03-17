@@ -1,5 +1,6 @@
 ﻿using BepInEx.Configuration;
 using HarmonyLib;
+using KiraiMod.Core.Utils;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -14,24 +15,16 @@ namespace KiraiMod.Modules
         public static readonly ConfigEntry<bool> noclip /**/ = Shared.Config.Bind("Flight", "NoClip", false, " Should you be able to go through solid objects");
         public static readonly ConfigEntry<float> speed /**/ = Shared.Config.Bind("Flight", "Speed", 8.0f, "The speed in meters per second at which you fly");
         public static readonly ConfigEntry<Key[]> keybind = Shared.Config.Bind("Flight", "keybind", new Key[] { Key.LeftCtrl, Key.F }, "The keybind to toggle flight");
-
-        private static bool state;
-        public static bool State
-        {
-            get => state;
-            set
-            {
-                if (state == value) return;
-                GUI.Movement.flight.Set(state = value, false);
-
-                if (value) Flight.Enable();
-                else Flight.Disable();
-            }
-        }
+        public static readonly Bound<bool> state = new();
 
         static Movement()
         {
-            keybind.Register(() => State ^= true);
+            state.ValueChanged += value => {
+                if (value) Flight.Enable();
+                else Flight.Disable();
+            };
+
+            keybind.Register(() => state.Value = !state._value);
 
             noclip.SettingChanged += (sender, args) => Collisions.Set(noclip.Value);
             directional.SettingChanged += (sender, args) => Target.Fetch();
@@ -168,7 +161,7 @@ namespace KiraiMod.Modules
                     return true;
 
                 Flight.oGrav = __0;
-                return !state;
+                return !state._value;
             }
         }
     }

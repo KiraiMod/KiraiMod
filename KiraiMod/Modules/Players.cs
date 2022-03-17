@@ -26,6 +26,10 @@ namespace KiraiMod.Modules
         {
             GUI.Players.Total.text = (VRCPlayerApi.AllPlayers.Count - 1).ToString();
             int offset = 0;
+
+            if (Target == player)
+                Target = null;
+
             for (int i = 0; i < GUI.Players.All.Count; i++)
             {
                 var gp = GUI.Players.All[i];
