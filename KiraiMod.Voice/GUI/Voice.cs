@@ -20,8 +20,8 @@ namespace KiraiMod.Voice.GUI
                 .Pinnable();
 
             (LoudMic = Body.Find("LoudMic").GetComponent<Toggle>()).On(state => Modules.Voice.LoudMic = state);
-            Modules.Voice.UtopiaVoice.GUIBindFull(Body.Find("UtopiaVoice").GetComponent<Toggle>());
-            Modules.Voice.UtopiaOnly.GUIBindFull(Body.Find("UtopiaOnly").GetComponent<Toggle>());
+            Modules.Voice.UtopiaVoice.GUIBind(Body.Find("UtopiaVoice").GetComponent<Toggle>());
+            Modules.Voice.UtopiaOnly.GUIBind(Body.Find("UtopiaOnly").GetComponent<Toggle>());
         }
     }
 }
