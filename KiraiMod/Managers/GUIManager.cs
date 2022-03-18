@@ -81,7 +81,11 @@ namespace KiraiMod.Managers
             UserInterface = GUI.transform.Find("UserInterface").gameObject;
             Pinned = GUI.transform.Find("Pinned").gameObject;
 
-            OnLoad?.Invoke();
+            try { OnLoad?.Invoke(); }  
+            catch (Exception ex)
+            {
+                Shared.Logger.LogError("An exception has occurred whilst loading GUI " + ex);
+            }
 
             Shared.Logger.LogInfo("Loaded GUI");
         }
