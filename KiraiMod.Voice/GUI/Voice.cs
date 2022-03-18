@@ -8,8 +8,6 @@ namespace KiraiMod.Voice.GUI
 {
     public static class Voice
     {
-        public static Toggle LoudMic;
-
         public static void Setup(Transform Self)
         {
             Transform Body = Self.Find("Body");
@@ -19,7 +17,7 @@ namespace KiraiMod.Voice.GUI
                 .Closable(Body.gameObject)
                 .Pinnable();
 
-            (LoudMic = Body.Find("LoudMic").GetComponent<Toggle>()).On(state => Modules.Voice.LoudMic = state);
+            Modules.Voice.LoudMic.Bind(Body.Find("LoudMic").GetComponent<Toggle>());
             Modules.Voice.UtopiaVoice.GUIBind(Body.Find("UtopiaVoice").GetComponent<Toggle>());
             Modules.Voice.UtopiaOnly.GUIBind(Body.Find("UtopiaOnly").GetComponent<Toggle>());
         }
