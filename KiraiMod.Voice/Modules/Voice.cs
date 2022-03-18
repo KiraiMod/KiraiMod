@@ -1,6 +1,7 @@
 ﻿using BepInEx.Configuration;
 using ExitGames.Client.Photon;
 using KiraiMod.Core;
+using KiraiMod.Core.Utils;
 using System;
 using System.Reflection;
 using UnityEngine.SceneManagement;
@@ -9,6 +10,7 @@ namespace KiraiMod.Voice.Modules
 {
     public static class Voice
     {
+        public static Bound<bool> LoudMic = new();
         public static ConfigEntry<bool> UtopiaVoice = Plugin.cfg.Bind("Voice", "UtopiaVoice", false, "Prevent from hearing you unless they have Utopia Voice");
         public static ConfigEntry<bool> UtopiaOnly = Plugin.cfg.Bind("Voice", "UtopiaOnly", false, "Only hear other Utopia voices");
 
@@ -16,15 +18,10 @@ namespace KiraiMod.Voice.Modules
         private static readonly object[] volumeOn = new object[1] { float.MaxValue };
         private static readonly object[] volumeOff = new object[1] { 1 };
 
-        public static bool _loudmic;
-        public static bool LoudMic
+        static Voice()
         {
-            set
+            LoudMic.ValueChanged += value =>
             {
-                if (_loudmic == value) return;
-                _loudmic = value;
-                GUI.Voice.LoudMic.Set(value, false);
-
                 if (value)
                 {
                     m_MicVolume.Invoke(null, volumeOn);
@@ -35,11 +32,8 @@ namespace KiraiMod.Voice.Modules
                     m_MicVolume.Invoke(null, volumeOff);
                     Events.WorldLoaded -= OnWorldLoad;
                 }
-            }
-        }
+            };
 
-        static Voice()
-        {
             Plugin.harmony.Patch(
                 Core.Types.VRCNetworkingClient.m_OnEvent,
                 typeof(Voice).GetMethod(nameof(HookInbound), BindingFlags.NonPublic | BindingFlags.Static).ToHM()
@@ -51,7 +45,7 @@ namespace KiraiMod.Voice.Modules
             );
         }
 
-        private static void OnWorldLoad(Scene scene) => LoudMic = false;
+        private static void OnWorldLoad(Scene scene) => LoudMic.Value = false;
 
         private static unsafe void HookOutbound(byte __0, ref Il2CppSystem.Object __1)
         {
