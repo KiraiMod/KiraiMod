@@ -19,6 +19,8 @@ namespace KiraiMod.Modules
 
         static Movement()
         {
+            Events.WorldUnloaded += scene => state.Value = false;
+
             state.ValueChanged += value => {
                 if (value) Flight.Enable();
                 else Flight.Disable();
