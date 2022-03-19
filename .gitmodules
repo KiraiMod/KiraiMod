@@ -10,3 +10,10 @@
 	path = KiraiMod.Moderations
 	url = git@gitlab.com:KiraiMod/moderations.git
 	branch = master
+[submodule "bepinex"]
+	path = bepinex
+	url = https://github.com/xKiraiChan/WingAPI
+[submodule "WingAPI"]
+	path = WingAPI
+	url = https://github.com/xKiraiChan/WingAPI
+	branch = bepinex
