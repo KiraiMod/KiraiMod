@@ -33,7 +33,7 @@ namespace KiraiMod.GUI.Common
 
         public Window Pinnable()
         {
-            Root.Find("Title/Pin").GetComponent<Toggle>().On(state => Root.SetParent(state ? Managers.GUIManager.Pinned.transform : Managers.GUIManager.UserInterface.transform));
+            Root.Find("Title/Pin").GetComponent<Toggle>().On(state => Root.SetParent(state ? Core.UI.LegacyGUIManager.Pinned.transform : Core.UI.LegacyGUIManager.UserInterface.transform));
             return this;
         }
     }

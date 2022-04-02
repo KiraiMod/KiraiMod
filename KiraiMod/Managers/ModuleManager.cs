@@ -13,6 +13,7 @@ namespace KiraiMod.Managers
         public static Dictionary<string, Type[]> Modules = new();
 
         // in the future this class may be responsible for UI stuff, a la old kiraimod
+        // with how Core.UI is looking, probably not, but its still possible
         static ModuleManager()
         {
             Register(Assembly.GetExecutingAssembly());

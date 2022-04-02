@@ -1,5 +1,6 @@
 ﻿using BepInEx.Configuration;
 using HarmonyLib;
+using KiraiMod.Core.UI;
 using KiraiMod.Core.Utils;
 using System;
 using System.Reflection;
@@ -17,6 +18,24 @@ namespace KiraiMod.Modules
         static Pickups()
         {
             typeof(Modifiers).Initialize();
+
+            LegacyGUIManager.OnLoad += () =>
+            {
+                UIGroup ui = new(nameof(Pickups));
+                ui.RegisterAsHighest();
+
+                ui.AddElement("Unlock", Modifiers.unlock.Value).Bound.Bind(Modifiers.unlock); //              if you think it's an anti pattern
+                ui.AddElement("Theft", Modifiers.theft.Value).Bound.Bind(Modifiers.theft); //                 writing the name of the config entry
+                ui.AddElement("Rotate", Modifiers.rotate.Value).Bound.Bind(Modifiers.rotate); //              twice for every single ui element
+                ui.AddElement("Reach", Modifiers.reach.Value).Bound.Bind(Modifiers.reach); //                 then hope for bepinex to give
+                ui.AddElement("Boost", Modifiers.boost.Value).Bound.Bind(Modifiers.boost); //                 config entry a base class we can use 
+                ui.AddElement("Boost Speed", Modifiers.boostSpeed.Value).Bound.Bind(Modifiers.boostSpeed); // instead of bound
+
+                ui.AddElement("Orbit", Orbit.State);
+                ui.AddElement("Orbit Speed", Orbit.Speed.Value).Bound.Bind(Orbit.Speed);
+                ui.AddElement("Orbit Distance", Orbit.Distance.Value).Bound.Bind(Orbit.Distance);
+                ui.AddElement("Orbit Offset", Orbit.Offset.Value).Bound.Bind(Orbit.Offset);
+            };
         }
 
         public static class Modifiers

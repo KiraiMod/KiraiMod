@@ -1,5 +1,6 @@
 ﻿using BepInEx.Configuration;
 using HarmonyLib;
+using KiraiMod.Core.UI;
 using KiraiMod.Core.Utils;
 using System.Runtime.CompilerServices;
 using UnityEngine;
@@ -11,11 +12,11 @@ namespace KiraiMod.Modules
 {
     public static class Movement
     {
-        public static readonly ConfigEntry<bool> directional = Shared.Config.Bind("Flight", "Directional", false, "Should you move in the direction you are looking");
+        public static readonly Bound<bool> state = new();
         public static readonly ConfigEntry<bool> noclip /**/ = Shared.Config.Bind("Flight", "NoClip", false, " Should you be able to go through solid objects");
+        public static readonly ConfigEntry<bool> directional = Shared.Config.Bind("Flight", "Directional", false, "Should you move in the direction you are looking");
         public static readonly ConfigEntry<float> speed /**/ = Shared.Config.Bind("Flight", "Speed", 8.0f, "The speed in meters per second at which you fly");
         public static readonly ConfigEntry<Key[]> keybind = Shared.Config.Bind("Flight", "keybind", new Key[] { Key.LeftCtrl, Key.F }, "The keybind to toggle flight");
-        public static readonly Bound<bool> state = new();
 
         static Movement()
         {
@@ -32,6 +33,16 @@ namespace KiraiMod.Modules
             directional.SettingChanged += (sender, args) => Target.Fetch();
 
             typeof(Hooks).Initialize();
+
+            LegacyGUIManager.OnLoad += () =>
+            {
+                UIGroup ui = new(nameof(Movement));
+                ui.RegisterAsHighest();
+                ui.AddElement("Flight", state);
+                ui.AddElement("Flight Speed", speed.Value).Bound.Bind(speed);
+                ui.AddElement("NoClip", noclip.Value).Bound.Bind(noclip);
+                ui.AddElement("Directional", directional.Value).Bound.Bind(directional);
+            };
         }
 
         // in the future this may have more complicated logic

@@ -27,7 +27,7 @@ namespace KiraiMod.Voice
             harmony = new(GUID);
 
             Managers.ModuleManager.Register();
-            Managers.GUIManager.OnLoad += GUIManager_OnLoad;
+            Core.UI.LegacyGUIManager.OnLoad += GUIManager_OnLoad;
         }
 
         private void GUIManager_OnLoad()
@@ -43,7 +43,7 @@ namespace KiraiMod.Voice
                 .transform;
 
             for (int i = 0; i < GUI.childCount; i++)
-                GUI.GetChild(i).SetParent(Managers.GUIManager.UserInterface.transform);
+                GUI.GetChild(i).SetParent(Core.UI.LegacyGUIManager.UserInterface.transform);
 
             GUI.Destroy();
         }

@@ -5,89 +5,36 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace KiraiMod.Managers
 {
     public static class GUIManager
     {
-        public static event Action OnLoad;
-        public static event Action<bool> OnUIToggle;
-
-        public static GameObject GUI;
-        public static GameObject UserInterface;
-        public static GameObject Pinned;
-
-        private static AssetBundle bundle;
-
-        private static EventSystem system;
-        private static BaseInputModule inputFix;
-        private static BaseInputModule inputOrig;
-
-        public static bool Showing
-        {
-            get => UserInterface.active;
-            set
-            {
-                if (UserInterface.active == value)
-                    return;
-
-                UserInterface.active = value;
-                OnUIToggle?.Invoke(value);
-
-                inputOrig.enabled = !(inputFix.enabled = value);
-            }
-        }
-
         static GUIManager()
         {
-            Events.UIManagerLoaded += OnUIManagerLoaded;
+            Core.UI.LegacyGUIManager.OnLoad += LoadGUI;
+            Core.UI.LegacyGUIManager.OnLoadLate += SetupHandlers;
 
-            Shared.Config.Bind("GUI", "Keybind", new Key[] { Key.RightShift }, "The keybind you want to use to open the GUI").Register(() => Showing ^= true);
+            if (Shared.Config.Bind("GUI", "SideUI", true, "Should the GUI manager automatically start up the SideUI adapter?").Value)
+                Core.UI.SideUI.Adapter.Initialize();
         }
 
-        private static void OnUIManagerLoaded()
-        {
-            SetupFix();
-            LoadAssetBundle();
-            CreateUI();
-            SetupHandlers();
-        }
-
-        private static void SetupFix()
-        {
-            var sys = GameObject.Find("_Application/UiEventSystem");
-            inputOrig = (system = sys.GetComponent<EventSystem>()).m_SystemInputModules[0];
-            (inputFix = sys.AddComponent<StandaloneInputModule>()).enabled = false;
-        }
-
-        private static void LoadAssetBundle()
+        private static void LoadGUI()
         {
             MemoryStream mem = new();
             Assembly.GetExecutingAssembly().GetManifestResourceStream("KiraiMod.Lib.KiraiMod.GUI.AssetBundle").CopyTo(mem);
-            bundle = AssetBundle.LoadFromMemory(mem.ToArray());
+            AssetBundle bundle = AssetBundle.LoadFromMemory(mem.ToArray());
             bundle.hideFlags |= HideFlags.HideAndDontSave;
-        }
-
-        private static void CreateUI()
-        {
-            (GUI = bundle.LoadAsset("assets/gui.prefab")
+            Transform GUI = bundle.LoadAsset("assets/gui.prefab")
                 .Cast<GameObject>()
                 .Instantiate()
-                .DontDestroyOnLoad()).name = "KiraiMod.GUI";
+                .transform;
 
-            UserInterface = GUI.transform.Find("UserInterface").gameObject;
-            Pinned = GUI.transform.Find("Pinned").gameObject;
+            for (int i = 0; i < GUI.childCount; i++)
+                GUI.GetChild(i).SetParent(Core.UI.LegacyGUIManager.UserInterface.transform);
 
-            try { OnLoad?.Invoke(); }  
-            catch (Exception ex)
-            {
-                Shared.Logger.LogError("An exception has occurred whilst loading GUI " + ex);
-            }
-
-            Shared.Logger.LogInfo("Loaded GUI");
+            GUI.Destroy();
         }
 
         private static void SetupHandlers()
@@ -97,9 +44,11 @@ namespace KiraiMod.Managers
 
             Type[] handlers = ModuleManager.Modules["GUI"];
 
-            for (int i = 0; i < UserInterface.transform.childCount; i++)
+            Console.WriteLine("settingu p handlers: " + Core.UI.LegacyGUIManager.UserInterface.transform.childCount);
+            for (int i = 0; i < Core.UI.LegacyGUIManager.UserInterface.transform.childCount; i++)
             {
-                Transform child = UserInterface.transform.GetChild(i);
+                Transform child = Core.UI.LegacyGUIManager.UserInterface.transform.GetChild(i);
+            Console.WriteLine(child.name);
                 Type handler = handlers.FirstOrDefault(x => x.Name == child.name);
 
                 if (handler == null)
@@ -118,18 +67,61 @@ namespace KiraiMod.Managers
                 try
                 {
                     setup.Invoke(null, new object[1] { child });
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     Shared.Logger.LogError($"Setup method for GUI handler {child.name} failed: {ex}");
                     child.gameObject.active = false;
                 }
             }
 
-            UserInterface.active = false;
+            Core.UI.LegacyGUIManager.UserInterface.active = false;
 
             sw.Stop();
 
             Shared.Logger.LogInfo($"Setup GUI in {sw.Elapsed.Milliseconds} ms");
+        }
+
+        [Obsolete("Use Core.UI.LegacyGUIManager")]
+        public static event Action OnLoad
+        {
+            add => Core.UI.LegacyGUIManager.OnLoad += value;
+            remove => Core.UI.LegacyGUIManager.OnLoad -= value;
+        }
+
+        [Obsolete("Use Core.UI.LegacyGUIManager")]
+        public static event Action<bool> OnUIToggle
+        {
+            add => Core.UI.LegacyGUIManager.OnUIToggle += value;
+            remove => Core.UI.LegacyGUIManager.OnUIToggle -= value;
+        }
+
+        [Obsolete("Use Core.UI.LegacyGUIManager")]
+        public static GameObject GUI
+        {
+            get => Core.UI.LegacyGUIManager.GUI;
+            set => Core.UI.LegacyGUIManager.GUI = value;
+        }
+
+        [Obsolete("Use Core.UI.LegacyGUIManager")]
+        public static GameObject UserInterface
+        {
+            get => Core.UI.LegacyGUIManager.UserInterface;
+            set => Core.UI.LegacyGUIManager.UserInterface = value;
+        }
+
+        [Obsolete("Use Core.UI.LegacyGUIManager")]
+        public static GameObject Pinned
+        {
+            get => Core.UI.LegacyGUIManager.Pinned;
+            set => Core.UI.LegacyGUIManager.Pinned = value;
+        }
+
+        [Obsolete("Use Core.UI.LegacyGUIManager")]
+        public static bool Showing
+        {
+            get => Core.UI.LegacyGUIManager.Showing;
+            set => Core.UI.LegacyGUIManager.Showing = value;
         }
 
         public static void GUIBind(this ConfigEntry<bool> entry, Toggle toggle)
