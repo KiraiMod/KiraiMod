@@ -1,12 +1,13 @@
 ﻿using BepInEx.Configuration;
 using ExitGames.Client.Photon;
 using KiraiMod.Core;
+using KiraiMod.Core.UI;
 using KiraiMod.Core.Utils;
 using System;
 using System.Reflection;
 using UnityEngine.SceneManagement;
 
-namespace KiraiMod.Voice.Modules
+namespace KiraiMod.Voice
 {
     public static class Voice
     {
@@ -20,6 +21,15 @@ namespace KiraiMod.Voice.Modules
 
         static Voice()
         {
+            LegacyGUIManager.OnLoad += () =>
+            {
+                UIGroup ui = new(nameof(Voice));
+                ui.RegisterAsHighest();
+                ui.AddElement("Loud Mic", LoudMic);
+                ui.AddElement("Utopia Voice", UtopiaVoice.Value).Bound.Bind(UtopiaVoice);
+                ui.AddElement("Utopia Only", UtopiaOnly.Value).Bound.Bind(UtopiaOnly);
+            };
+
             LoudMic.ValueChanged += value =>
             {
                 if (value)
