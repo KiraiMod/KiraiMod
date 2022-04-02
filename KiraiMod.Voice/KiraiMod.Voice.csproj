@@ -7,16 +7,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <None Remove="Lib\KiraiMod.Voice.GUI.AssetBundle" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <EmbeddedResource Include="Lib\KiraiMod.Voice.GUI.AssetBundle" />
-	</ItemGroup>
-
-	<ItemGroup>
+	  <ProjectReference Include="..\KiraiMod.Core.UI\KiraiMod.Core.UI.csproj" />
 	  <ProjectReference Include="..\KiraiMod.Core\KiraiMod.Core.csproj" />
-	  <ProjectReference Include="..\KiraiMod\KiraiMod.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
