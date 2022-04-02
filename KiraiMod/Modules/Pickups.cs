@@ -18,6 +18,7 @@ namespace KiraiMod.Modules
         static Pickups()
         {
             typeof(Modifiers).Initialize();
+            typeof(Orbit).Initialize();
 
             LegacyGUIManager.OnLoad += () =>
             {
@@ -128,9 +129,14 @@ namespace KiraiMod.Modules
                     if (value)
                     {
                         pickups = UnityEngine.Object.FindObjectsOfType<VRC_Pickup>();
+                        Events.PlayerLeft += CheckTargetMissing;
                         Events.Update += Update;
                     }
-                    else Events.Update -= Update;
+                    else
+                    {
+                        Events.PlayerLeft -= CheckTargetMissing;
+                        Events.Update -= Update;
+                    }
                 };
             }
 
@@ -158,6 +164,12 @@ namespace KiraiMod.Modules
                         Players.Target.VRCPlayerApi.gameObject.transform.position
                         + new Vector3(Mathf.Sin(Time.time * Speed.Value + degrees * i) * Distance.Value, Offset.Value, Mathf.Cos(Time.time * Speed.Value + degrees * i) * Distance.Value);
                 }
+            }
+
+            private static void CheckTargetMissing(Core.Types.Player player)
+            {
+                if (player.Inner == Players.Target.Inner)
+                    State.Value = false;
             }
         }
 

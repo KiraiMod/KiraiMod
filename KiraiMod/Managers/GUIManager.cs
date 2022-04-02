@@ -44,11 +44,9 @@ namespace KiraiMod.Managers
 
             Type[] handlers = ModuleManager.Modules["GUI"];
 
-            Console.WriteLine("settingu p handlers: " + Core.UI.LegacyGUIManager.UserInterface.transform.childCount);
             for (int i = 0; i < Core.UI.LegacyGUIManager.UserInterface.transform.childCount; i++)
             {
                 Transform child = Core.UI.LegacyGUIManager.UserInterface.transform.GetChild(i);
-            Console.WriteLine(child.name);
                 Type handler = handlers.FirstOrDefault(x => x.Name == child.name);
 
                 if (handler == null)
