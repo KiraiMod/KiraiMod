@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: GitHub Discussions
+    url: https://github.com/KiraiMod/KiraiMod/discussions
+    about: "Talk freely about features and issues here"
+  - name: Discord
+    url: https://discord.gg/u8BN9h3emB
+    about: "You will most likely get faster support on Discord"
