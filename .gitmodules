@@ -1,12 +1,23 @@
-[submodule "KiraiMod.Updater"]
-	path = KiraiMod.Updater
-	url = git@gitlab.com:KiraiMod/Updater.git
+[submodule "Core"]
+	path = Core
+	url = https://github.com/KiraiMod/Core
+	branch = master
+[submodule "KiraiMod.Core"]
+	path = KiraiMod.Core
+	url = https://github.com/KiraiMod/Core
+	branch = master
+[submodule "KiraiMod.AssetBundles"]
+	path = KiraiMod.AssetBundles
+	url = https://github.com/KiraiMod/AssetBundles
+	branch = master
+[submodule "KiraiMod.Private"]
+	path = KiraiMod.Private
+	url = https://github.com/KiraiMod/Private
+	branch = master
+[submodule "KiraiMod.Core.UI"]
+	path = KiraiMod.Core.UI
+	url = https://github.com/KiraiMod/Core.UI
 	branch = master
 [submodule "TypeScanner"]
 	path = TypeScanner
-	url = https://github.com/xKiraiChan/TypeScanner.git
-	branch = master
-[submodule "KiraiMod.Moderations"]
-	path = KiraiMod.Moderations
-	url = git@gitlab.com:KiraiMod/moderations.git
-	branch = master
+	url = https://github.com/xKiraiChan/TypeScanner
