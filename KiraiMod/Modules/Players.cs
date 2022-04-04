@@ -12,8 +12,8 @@ namespace KiraiMod.Modules
 
         static Players()
         {
-            Events.PlayerJoined += OnPlayerJoined;
-            Events.PlayerLeft += OnPlayerLeft;
+            Events.Player.Joined += OnPlayerJoined;
+            Events.Player.Left += OnPlayerLeft;
         }
 
         private static void OnPlayerJoined(Core.Types.Player player)

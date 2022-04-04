@@ -129,12 +129,12 @@ namespace KiraiMod.Modules
                     if (value)
                     {
                         pickups = UnityEngine.Object.FindObjectsOfType<VRC_Pickup>();
-                        Events.PlayerLeft += CheckTargetMissing;
+                        Events.Player.Left += CheckTargetMissing;
                         Events.Update += Update;
                     }
                     else
                     {
-                        Events.PlayerLeft -= CheckTargetMissing;
+                        Events.Player.Left -= CheckTargetMissing;
                         Events.Update -= Update;
                     }
                 };
