@@ -13,7 +13,7 @@ namespace KiraiMod.Modules
 {
     public static class Pickups
     {
-        private static readonly HarmonyMethod NoOp = typeof(Pickups).GetMethod(nameof(HkNoOp), BindingFlags.NonPublic | BindingFlags.Static).ToHM();
+        private static readonly MethodInfo NoOp = typeof(Pickups).GetMethod(nameof(HkNoOp), BindingFlags.NonPublic | BindingFlags.Static);
 
         static Pickups()
         {
@@ -81,12 +81,13 @@ namespace KiraiMod.Modules
 
             public class BasePickupModifier
             {
-                private MethodInfo hook;
                 private readonly Action<VRC_Pickup> setup;
 
                 public BasePickupModifier(MethodInfo orig, ConfigEntry<bool> entry, Action<VRC_Pickup> setup)
                 {
                     this.setup = setup;
+                    ToggleHook hook = new(orig, NoOp);
+
                     entry.SettingChanged += ((EventHandler)((sender, args) =>
                     {
                         if (theft.Value)
@@ -94,12 +95,12 @@ namespace KiraiMod.Modules
                             Events.WorldLoaded += OnWorldLoaded;
                             foreach (VRC_Pickup pickup in UnityEngine.Object.FindObjectsOfType<VRC_Pickup>())
                                 setup(pickup);
-                            hook = Shared.Harmony.Patch(orig, NoOp);
+                            hook.Toggle(true);
                         }
                         else
                         {
                             Events.WorldLoaded -= OnWorldLoaded;
-                            Shared.Harmony.Unpatch(orig, hook);
+                            hook.Toggle(false);
                         }
                     })).Invoke();
                 }

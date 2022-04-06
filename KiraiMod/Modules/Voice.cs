@@ -1,19 +1,17 @@
 ﻿using BepInEx.Configuration;
 using ExitGames.Client.Photon;
-using KiraiMod.Core;
-using KiraiMod.Core.UI;
 using KiraiMod.Core.Utils;
 using System;
 using System.Reflection;
 using UnityEngine.SceneManagement;
 
-namespace KiraiMod.Voice
+namespace KiraiMod.Modules
 {
     public static class Voice
     {
         public static Bound<bool> LoudMic = new();
-        public static ConfigEntry<bool> UtopiaVoice = Plugin.cfg.Bind("Voice", "UtopiaVoice", false, "Prevent from hearing you unless they have Utopia Voice");
-        public static ConfigEntry<bool> UtopiaOnly = Plugin.cfg.Bind("Voice", "UtopiaOnly", false, "Only hear other Utopia voices");
+        public static ConfigEntry<bool> UtopiaVoice = Shared.Config.Bind("Voice", "UtopiaVoice", false, "Prevent from hearing you unless they have Utopia Voice");
+        public static ConfigEntry<bool> UtopiaOnly = Shared.Config.Bind("Voice", "UtopiaOnly", false, "Only hear other Utopia voices");
 
         private static readonly MethodInfo m_MicVolume = Core.Types.USpeaker.Type.GetProperty("field_Internal_Static_Single_1").GetSetMethod();
         private static readonly object[] volumeOn = new object[1] { float.MaxValue };
@@ -21,9 +19,9 @@ namespace KiraiMod.Voice
 
         static Voice()
         {
-            LegacyGUIManager.OnLoad += () =>
+            Core.UI.LegacyGUIManager.OnLoad += () =>
             {
-                UIGroup ui = new(nameof(Voice));
+                Core.UI.UIGroup ui = new(nameof(Voice));
                 ui.RegisterAsHighest();
                 ui.AddElement("Loud Mic", LoudMic);
                 ui.AddElement("Utopia Voice", UtopiaVoice.Value).Bound.Bind(UtopiaVoice);
@@ -44,15 +42,8 @@ namespace KiraiMod.Voice
                 }
             };
 
-            Plugin.harmony.Patch(
-                Core.Types.VRCNetworkingClient.m_OnEvent,
-                typeof(Voice).GetMethod(nameof(HookInbound), BindingFlags.NonPublic | BindingFlags.Static).ToHM()
-            );
-
-            Plugin.harmony.Patch(
-                Core.Types.VRCNetworkingClient.m_OpRaiseEvent,
-                typeof(Voice).GetMethod(nameof(HookOutbound), BindingFlags.NonPublic | BindingFlags.Static).ToHM()
-            );
+            ToggleHook inbound = new ToggleHook(Core.Types.VRCNetworkingClient.m_OnEvent, typeof(Voice).GetMethod(nameof(HookInbound), BindingFlags.NonPublic | BindingFlags.Static)).Enable();
+            ToggleHook outbound = new ToggleHook(Core.Types.VRCNetworkingClient.m_OpRaiseEvent, typeof(Voice).GetMethod(nameof(HookOutbound), BindingFlags.NonPublic | BindingFlags.Static)).Enable();
         }
 
         private static void OnWorldLoad(Scene scene) => LoudMic.Value = false;
