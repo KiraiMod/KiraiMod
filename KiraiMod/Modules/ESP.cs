@@ -9,7 +9,7 @@ namespace KiraiMod.Modules
 {
     public static class ESP
     {
-        public static ConfigEntry<bool> Enabled = Shared.Config.Bind("ESP", "Enabled", true, "Should players have an outline drawn around them?");
+        public static ConfigEntry<bool> Enabled = Plugin.cfg.Bind("ESP", "Enabled", true, "Should players have an outline drawn around them?");
 
         private static readonly MethodInfo m_GetSimpleAvatarPedestal = typeof(Component).GetMethod(nameof(Component.GetComponent), new Type[0]).MakeGenericMethod(Core.Types.SimpleAvatarPedestal.Type);
 

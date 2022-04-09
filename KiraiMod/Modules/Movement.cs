@@ -13,10 +13,10 @@ namespace KiraiMod.Modules
     public static class Movement
     {
         public static readonly Bound<bool> state = new();
-        public static readonly ConfigEntry<bool> noclip /**/ = Shared.Config.Bind("Flight", "NoClip", false, " Should you be able to go through solid objects");
-        public static readonly ConfigEntry<bool> directional = Shared.Config.Bind("Flight", "Directional", false, "Should you move in the direction you are looking");
-        public static readonly ConfigEntry<float> speed /**/ = Shared.Config.Bind("Flight", "Speed", 8.0f, "The speed in meters per second at which you fly");
-        public static readonly ConfigEntry<Key[]> keybind = Shared.Config.Bind("Flight", "keybind", new Key[] { Key.LeftCtrl, Key.F }, "The keybind to toggle flight");
+        public static readonly ConfigEntry<bool> noclip /**/ = Plugin.cfg.Bind("Flight", "NoClip", false, " Should you be able to go through solid objects");
+        public static readonly ConfigEntry<bool> directional = Plugin.cfg.Bind("Flight", "Directional", false, "Should you move in the direction you are looking");
+        public static readonly ConfigEntry<float> speed /**/ = Plugin.cfg.Bind("Flight", "Speed", 8.0f, "The speed in meters per second at which you fly");
+        public static readonly ConfigEntry<Key[]> keybind = Plugin.cfg.Bind("Flight", "keybind", new Key[] { Key.LeftCtrl, Key.F }, "The keybind to toggle flight");
 
         static Movement()
         {

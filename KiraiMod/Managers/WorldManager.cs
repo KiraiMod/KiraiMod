@@ -32,7 +32,7 @@ namespace KiraiMod.Managers
                     try { return Activator.CreateInstance(target); }
                     catch (Exception ex)
                     {
-                        Shared.Logger.LogError($"Failed to load world mod: {ex}");
+                        Plugin.log.LogError($"Failed to load world mod: {ex}");
                         return null;
                     }
                 })

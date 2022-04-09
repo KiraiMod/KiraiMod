@@ -7,7 +7,7 @@ namespace KiraiMod.Modules
 {
     public static class ForceClone
     {
-        public static ConfigEntry<bool> Enabled = Shared.Config.Bind("ForceClone", "Enabled", true, "Force a user to allow you to clone their avatar if it is public");
+        public static ConfigEntry<bool> Enabled = Plugin.cfg.Bind("ForceClone", "Enabled", true, "Force a user to allow you to clone their avatar if it is public");
 
         private static readonly MethodInfo original = typeof(VRC.Core.APIUser).GetProperty(nameof(VRC.Core.APIUser.allowAvatarCopying)).GetSetMethod();
         private static readonly HarmonyMethod target = typeof(ForceClone).GetMethod(nameof(Hook), BindingFlags.NonPublic | BindingFlags.Static).ToHM();
@@ -21,8 +21,8 @@ namespace KiraiMod.Modules
                 if (_state == value) return;
                 _state = value;
 
-                if (value) hook = Shared.Harmony.Patch(original, target);
-                else Shared.Harmony.Unpatch(original, hook);
+                if (value) hook = Plugin.harmony.Patch(original, target);
+                else Plugin.harmony.Unpatch(original, hook);
             }
         }
 

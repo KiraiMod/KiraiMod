@@ -41,12 +41,12 @@ namespace KiraiMod.Modules
 
         public static class Modifiers
         {
-            public static ConfigEntry<bool> unlock = Shared.Config.Bind("Pickups", "Unlock", false, "Should all pickups always pickupable");
-            public static ConfigEntry<bool> theft = Shared.Config.Bind("Pickups", "Theft", false, "Should you be able to take things out of people's hands");
-            public static ConfigEntry<bool> rotate = Shared.Config.Bind("Pickups", "Rotate", false, "Shoud you be able to rotate all pickups in your hand");
-            public static ConfigEntry<bool> reach = Shared.Config.Bind("Pickups", "Reach", false, "Should you be able to pickup things from any distance");
-            public static ConfigEntry<bool> boost = Shared.Config.Bind("Pickups", "Boost", false, "Should you be able to throw things faster");
-            public static ConfigEntry<float> boostSpeed = Shared.Config.Bind("Pickups", "BoostSpeed", 5.0f, "The speed at which pickups are thrown");
+            public static ConfigEntry<bool> unlock = Plugin.cfg.Bind("Pickups", "Unlock", false, "Should all pickups always pickupable");
+            public static ConfigEntry<bool> theft = Plugin.cfg.Bind("Pickups", "Theft", false, "Should you be able to take things out of people's hands");
+            public static ConfigEntry<bool> rotate = Plugin.cfg.Bind("Pickups", "Rotate", false, "Shoud you be able to rotate all pickups in your hand");
+            public static ConfigEntry<bool> reach = Plugin.cfg.Bind("Pickups", "Reach", false, "Should you be able to pickup things from any distance");
+            public static ConfigEntry<bool> boost = Plugin.cfg.Bind("Pickups", "Boost", false, "Should you be able to throw things faster");
+            public static ConfigEntry<float> boostSpeed = Plugin.cfg.Bind("Pickups", "BoostSpeed", 5.0f, "The speed at which pickups are thrown");
 
             static Modifiers()
             {
@@ -64,7 +64,7 @@ namespace KiraiMod.Modules
                             pickup.ThrowVelocityBoostScale = boostSpeed.Value;
                 };
 
-                Shared.Harmony.Patch(
+                Plugin.harmony.Patch(
                     typeof(VRC_Pickup).GetMethod(nameof(VRC_Pickup.Awake)),
                     typeof(Modifiers).GetMethod(nameof(HookAwake), BindingFlags.NonPublic | BindingFlags.Static).ToHM()
                 );
@@ -115,9 +115,9 @@ namespace KiraiMod.Modules
 
         public static class Orbit
         {
-            public static ConfigEntry<float> Speed = Shared.Config.Bind("Pickups", "OrbitSpeed", 1f, "How fast the items complete a full revolution around the target");
-            public static ConfigEntry<float> Distance = Shared.Config.Bind("Pickups", "OrbitDitance", 1f, "How far the items should be from the target");
-            public static ConfigEntry<float> Offset = Shared.Config.Bind("Pickups", "OrbitOffset", 0f, "How much the items should be above or below the target");
+            public static ConfigEntry<float> Speed = Plugin.cfg.Bind("Pickups", "OrbitSpeed", 1f, "How fast the items complete a full revolution around the target");
+            public static ConfigEntry<float> Distance = Plugin.cfg.Bind("Pickups", "OrbitDitance", 1f, "How far the items should be from the target");
+            public static ConfigEntry<float> Offset = Plugin.cfg.Bind("Pickups", "OrbitOffset", 0f, "How much the items should be above or below the target");
 
             public static Bound<bool> State = new();
 

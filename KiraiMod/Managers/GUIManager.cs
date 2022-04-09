@@ -16,7 +16,7 @@ namespace KiraiMod.Managers
             Core.UI.LegacyGUIManager.OnLoad += LoadGUI;
             Core.UI.LegacyGUIManager.OnLoadLate += SetupHandlers;
 
-            if (Shared.Config.Bind("GUI", "SideUI", true, "Should the GUI manager automatically start up the SideUI adapter?").Value)
+            if (Plugin.cfg.Bind("GUI", "SideUI", true, "Should the GUI manager automatically start up the SideUI adapter?").Value)
                 Core.UI.SideUI.Adapter.Initialize();
         }
 
@@ -51,14 +51,14 @@ namespace KiraiMod.Managers
 
                 if (handler == null)
                 {
-                    Shared.Logger.LogWarning($"Failed to find GUI handler for {child.name}");
+                    Plugin.log.LogWarning($"Failed to find GUI handler for {child.name}");
                     continue;
                 }
 
                 MethodInfo setup = handler.GetMethod("Setup");
                 if (setup == null)
                 {
-                    Shared.Logger.LogWarning($"Missing setup method for GUI handler {child.name}");
+                    Plugin.log.LogWarning($"Missing setup method for GUI handler {child.name}");
                     continue;
                 }
 
@@ -68,7 +68,7 @@ namespace KiraiMod.Managers
                 }
                 catch (Exception ex)
                 {
-                    Shared.Logger.LogError($"Setup method for GUI handler {child.name} failed: {ex}");
+                    Plugin.log.LogError($"Setup method for GUI handler {child.name} failed: {ex}");
                     child.gameObject.active = false;
                 }
             }
@@ -77,7 +77,7 @@ namespace KiraiMod.Managers
 
             sw.Stop();
 
-            Shared.Logger.LogInfo($"Setup GUI in {sw.Elapsed.Milliseconds} ms");
+            Plugin.log.LogInfo($"Setup GUI in {sw.Elapsed.Milliseconds} ms");
         }
 
         [Obsolete("Use Core.UI.LegacyGUIManager")]

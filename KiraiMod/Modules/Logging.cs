@@ -5,8 +5,8 @@ namespace KiraiMod.Modules
 {
     public static class Logging
     {
-        public static ConfigEntry<bool> PlayerJoin = Shared.Config.Bind("Logging", "PlayerJoin", true, "Should you be notified when someone joins?");
-        public static ConfigEntry<bool> PlayerLeave = Shared.Config.Bind("Logging", "PlayerLeave", true, "Should you be notified when someone leaves?");
+        public static ConfigEntry<bool> PlayerJoin = Plugin.cfg.Bind("Logging", "PlayerJoin", true, "Should you be notified when someone joins?");
+        public static ConfigEntry<bool> PlayerLeave = Plugin.cfg.Bind("Logging", "PlayerLeave", true, "Should you be notified when someone leaves?");
 
         static Logging()
         {
@@ -23,7 +23,7 @@ namespace KiraiMod.Modules
             })).Invoke();
         }
 
-        private static void LogPlayerJoined(Core.Types.Player player) => Shared.Logger.LogMessage($"{player.APIUser.displayName} joined");
-        private static void LogPlayerLeft(Core.Types.Player player) => Shared.Logger.LogMessage($"{player.APIUser.displayName} left");
+        private static void LogPlayerJoined(Core.Types.Player player) => Plugin.log.LogMessage($"{player.APIUser.displayName} joined");
+        private static void LogPlayerLeft(Core.Types.Player player) => Plugin.log.LogMessage($"{player.APIUser.displayName} left");
     }
 }

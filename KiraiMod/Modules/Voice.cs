@@ -10,8 +10,8 @@ namespace KiraiMod.Modules
     public static class Voice
     {
         public static Bound<bool> LoudMic = new();
-        public static ConfigEntry<bool> UtopiaVoice = Shared.Config.Bind("Voice", "UtopiaVoice", false, "Prevent from hearing you unless they have Utopia Voice");
-        public static ConfigEntry<bool> UtopiaOnly = Shared.Config.Bind("Voice", "UtopiaOnly", false, "Only hear other Utopia voices");
+        public static ConfigEntry<bool> UtopiaVoice = Plugin.cfg.Bind("Voice", "UtopiaVoice", false, "Prevent from hearing you unless they have Utopia Voice");
+        public static ConfigEntry<bool> UtopiaOnly = Plugin.cfg.Bind("Voice", "UtopiaOnly", false, "Only hear other Utopia voices");
 
         private static readonly MethodInfo m_MicVolume = Core.Types.USpeaker.Type.GetProperty("field_Internal_Static_Single_1").GetSetMethod();
         private static readonly object[] volumeOn = new object[1] { float.MaxValue };
