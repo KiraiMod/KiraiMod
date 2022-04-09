@@ -38,10 +38,18 @@ namespace KiraiMod.Modules
             {
                 UIGroup ui = new(nameof(Movement));
                 ui.RegisterAsHighest();
-                ui.AddElement("Flight", state);
-                ui.AddElement("Flight Speed", speed.Value).Bound.Bind(speed);
-                ui.AddElement("NoClip", noclip.Value).Bound.Bind(noclip);
-                ui.AddElement("Directional", directional.Value).Bound.Bind(directional);
+
+                UIGroup flight = new("Flight", ui);
+                flight.AddElement("Enabled", state);
+                flight.AddElement("Flight Speed", speed.Value).Bound.Bind(speed);
+                flight.AddElement("NoClip", noclip.Value).Bound.Bind(noclip);
+                flight.AddElement("Directional", directional.Value).Bound.Bind(directional);
+
+                UIGroup position = new("Position", ui);
+                position.AddElement("Save Position").Changed += SavePosition;
+                position.AddElement("Load Position").Changed += LoadPosition;
+
+                ui.AddElement("Use Legacy Locomotion").Changed += UseLegacyLocomotion;
             };
         }
 
