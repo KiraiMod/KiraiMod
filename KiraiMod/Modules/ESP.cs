@@ -15,6 +15,8 @@ namespace KiraiMod.Modules
 
         static ESP()
         {
+            GUI.Groups.Loaded += () => GUI.Groups.Visuals.AddElement(nameof(ESP), Enabled.Value).Bound.Bind(Enabled);
+
             Core.Utils.ToggleHook hook = new(
                 typeof(PipelineManager).GetMethod(nameof(PipelineManager.Start)),
                 null,

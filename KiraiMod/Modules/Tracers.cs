@@ -12,13 +12,7 @@ namespace KiraiMod.Modules
 
         static Tracers()
         {
-            Core.UI.LegacyGUIManager.OnLoad += () =>
-            {
-                Core.UI.UIGroup ui = new(nameof(Tracers));
-                ui.RegisterAsHighest();
-                ui.AddElement("Player Tracers", PlayerTracers.Value).Bound.Bind(PlayerTracers);
-            };
-
+            GUI.Groups.Loaded += () => GUI.Groups.Visuals.AddElement("Player Tracers", PlayerTracers.Value).Bound.Bind(PlayerTracers);
 
             Events.ApplicationStart += () =>
             {
