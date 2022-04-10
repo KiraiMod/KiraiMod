@@ -44,8 +44,8 @@ namespace KiraiMod.Modules
             lr.startColor = color;
             lr.sortingOrder = -10;
             lr.sortingLayerID = 7711475;
-            lr.material.SetInt("_ZWrite", 1.0);
-            lr.material.SetInt("_ZTest", 0.0);
+            lr.material.SetInt("_ZWrite", 1);
+            lr.material.SetInt("_ZTest", 0);
         }
 
         private static void Draw(LineRenderer lr, Vector3 src)
