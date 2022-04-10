@@ -36,12 +36,16 @@ namespace KiraiMod.Modules
 
         private static void SetupLineRenderer(LineRenderer lr, Color color)
         {
-            lr.material = new Material(Shader.Find("Legacy Shaders/Particles/Additive"));
+            lr.material = new Material(Shader.Find("Hidden/Internal-Colored"));
             lr.startWidth = 0.002f;
             lr.endWidth = 0.002f;
             lr.useWorldSpace = false;
             lr.endColor = color;
             lr.startColor = color;
+            lr.sortingOrder = -10;
+            lr.sortingLayerID = 7711475;
+            lr.material.SetInt("_ZWrite", 1.0);
+            lr.material.SetInt("_ZTest", 0.0);
         }
 
         private static void Draw(LineRenderer lr, Vector3 src)
