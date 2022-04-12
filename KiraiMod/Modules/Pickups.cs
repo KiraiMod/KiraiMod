@@ -14,6 +14,7 @@ namespace KiraiMod.Modules
     public static class Pickups
     {
         private static readonly MethodInfo NoOp = typeof(Pickups).GetMethod(nameof(HkNoOp), BindingFlags.NonPublic | BindingFlags.Static);
+        private static bool HkNoOp() => false;
 
         static Pickups()
         {
@@ -25,17 +26,21 @@ namespace KiraiMod.Modules
                 UIGroup ui = new(nameof(Pickups));
                 ui.RegisterAsHighest();
 
-                ui.AddElement("Unlock", Modifiers.unlock.Value).Bound.Bind(Modifiers.unlock); //              if you think it's an anti pattern
-                ui.AddElement("Theft", Modifiers.theft.Value).Bound.Bind(Modifiers.theft); //                 writing the name of the config entry
-                ui.AddElement("Rotate", Modifiers.rotate.Value).Bound.Bind(Modifiers.rotate); //              twice for every single ui element
-                ui.AddElement("Reach", Modifiers.reach.Value).Bound.Bind(Modifiers.reach); //                 then hope for bepinex to give
-                ui.AddElement("Boost", Modifiers.boost.Value).Bound.Bind(Modifiers.boost); //                 config entry a base class we can use 
-                ui.AddElement("Boost Speed", Modifiers.boostSpeed.Value).Bound.Bind(Modifiers.boostSpeed); // instead of bound
+                UIGroup modifiers = new("Modifiers", ui);
+                modifiers.AddElement("Unlock", Modifiers.unlock.Value).Bound.Bind(Modifiers.unlock); //              if you think it's an anti pattern
+                modifiers.AddElement("Theft", Modifiers.theft.Value).Bound.Bind(Modifiers.theft); //                 writing the name of the config entry
+                modifiers.AddElement("Rotate", Modifiers.rotate.Value).Bound.Bind(Modifiers.rotate); //              twice for every single ui element
+                modifiers.AddElement("Reach", Modifiers.reach.Value).Bound.Bind(Modifiers.reach); //                 then hope for bepinex to give
+                modifiers.AddElement("Boost", Modifiers.boost.Value).Bound.Bind(Modifiers.boost); //                 config entry a base class we can use 
+                modifiers.AddElement("Boost Speed", Modifiers.boostSpeed.Value).Bound.Bind(Modifiers.boostSpeed); // instead of bound
 
-                ui.AddElement("Orbit", Orbit.State);
-                ui.AddElement("Orbit Speed", Orbit.Speed.Value).Bound.Bind(Orbit.Speed);
-                ui.AddElement("Orbit Distance", Orbit.Distance.Value).Bound.Bind(Orbit.Distance);
-                ui.AddElement("Orbit Offset", Orbit.Offset.Value).Bound.Bind(Orbit.Offset);
+                UIGroup orbit = new("Orbit", ui);
+                orbit.AddElement("Enabled", Orbit.State);
+                orbit.AddElement("Orbit Speed", Orbit.Speed.Value).Bound.Bind(Orbit.Speed);
+                orbit.AddElement("Orbit Distance", Orbit.Distance.Value).Bound.Bind(Orbit.Distance);
+                orbit.AddElement("Orbit Offset", Orbit.Offset.Value).Bound.Bind(Orbit.Offset);
+
+                ui.AddElement("Drop").Changed += Drop;
             };
         }
 
@@ -174,6 +179,11 @@ namespace KiraiMod.Modules
             }
         }
 
-        private static bool HkNoOp() => false;
+        public static void Drop()
+        {
+            foreach (VRC_Pickup pickup in UnityEngine.Object.FindObjectsOfTypeAll(UnhollowerRuntimeLib.Il2CppType.Of<VRC_Pickup>()).Cast<UnhollowerBaseLib.Il2CppReferenceArray<VRC_Pickup>>())
+                if (Networking.GetOwner(pickup.gameObject) != Networking.LocalPlayer)
+                    Networking.SetOwner(Networking.LocalPlayer, pickup.gameObject);
+        }
     }
 }
