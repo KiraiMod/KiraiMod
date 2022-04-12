@@ -1,60 +1,72 @@
 ﻿using UnityEngine;
 using VRC.SDKBase;
 using BepInEx.Configuration;
+using UnhollowerRuntimeLib;
+using System;
 
 namespace KiraiMod.Modules
 {
     public static class Tracers
     {
-        public static ConfigEntry<bool> PlayerTracers = Plugin.cfg.Bind(nameof(Tracers), "Players", false, "Should lines be drawn to every player in the world");
+        public static ConfigEntry<bool> PlayerTracers = Plugin.cfg.Bind("Tracers", "Players", false, "Should lines be drawn to every player in the world");
+        public static GameObject tracers;
+        public static TracersHelper instance;
+        //public static Camera cameraMain;
 
-        private static LineRenderer lr;
-
-        static Tracers()
+        static Tracers() 
         {
-            GUI.Groups.Loaded += () => GUI.Groups.Visuals.AddElement("Player Tracers", PlayerTracers.Value).Bound.Bind(PlayerTracers);
-
-            Events.ApplicationStart += () =>
-            {
-                SetupLineRenderer(lr = new GameObject("KiraiMod.Tracers").DontDestroyOnLoad().AddComponent<LineRenderer>(), new Color32(0x56, 0x00, 0xA5, 0xAF));
-                PlayerTracers.SettingChanged += ((System.EventHandler)((sender, args) =>
-                {
-                    if (lr.gameObject.active = PlayerTracers.Value)
-                        Events.Update += UpdatePlayerTracers;
-                    else Events.Update -= UpdatePlayerTracers;
-                })).Invoke();
+            Events.ApplicationStart += () => 
+            { 
+                //cameraMain = Camera.main; 
+                CreateGOTracers(); 
             };
+            GUI.Groups.Loaded += () => GUI.Groups.Visuals.AddElement("Player Tracers", PlayerTracers.Value).Bound.Bind(PlayerTracers);
         }
 
-        public static void UpdatePlayerTracers()
+        public static void CreateGOTracers()
         {
-            if (Networking.LocalPlayer is null) return;
-
-            lr.positionCount = VRCPlayerApi.AllPlayers.Count * 2;
-            Draw(lr, Networking.LocalPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position);
-        }
-
-        private static void SetupLineRenderer(LineRenderer lr, Color color)
-        {
-            lr.material = new Material(Shader.Find("Hidden/Internal-Colored"));
-            lr.startWidth = 0.002f;
-            lr.endWidth = 0.002f;
-            lr.useWorldSpace = false;
-            lr.endColor = color;
-            lr.startColor = color;
-            lr.sortingOrder = -10;
-            lr.sortingLayerID = 7711475;
-            lr.material.SetInt("_ZWrite", 1);
-            lr.material.SetInt("_ZTest", 0);
-        }
-
-        private static void Draw(LineRenderer lr, Vector3 src)
-        {
-            for (int i = 0; i < VRCPlayerApi.AllPlayers.Count; i++)
+            tracers = new GameObject("KiraiMod.Tracers").DontDestroyOnLoad();
+            instance = tracers.AddComponent<TracersHelper>();
+            PlayerTracers.SettingChanged += ((EventHandler)((sender, args) =>
             {
-                lr.SetPosition(i * 2, src);
-                lr.SetPosition(i * 2 + 1, VRCPlayerApi.AllPlayers[i].gameObject.transform.position);
+                instance.enabled = PlayerTracers.Value;
+            })).Invoke();
+
+        }
+        public class TracersHelper : MonoBehaviour
+        {
+            static TracersHelper() => ClassInjector.RegisterTypeInIl2Cpp<TracersHelper>();
+            public TracersHelper() : base(ClassInjector.DerivedConstructorPointer<TracersHelper>()) => ClassInjector.DerivedConstructorBody(this);
+            public TracersHelper(IntPtr ptr) : base(ptr) { }
+
+            private static Material lineMaterial;
+            public void OnRenderObject()
+            {
+                if (Networking.LocalPlayer == null) return;
+                if (Camera.current != Camera.main) return; //can be optimized by caching Camera.main & if statments can be collapsed into 1
+                foreach (VRCPlayerApi player in VRCPlayerApi.AllPlayers)
+                {
+                    GL.PushMatrix();
+                    CreateLineMaterial();
+                    lineMaterial.SetPass(0);
+                    GL.Begin(1);
+                    GL.Color(new Color(0x56, 0x00, 0xA5, 1));
+                    if (player.gameObject.transform.Find("ForwardDirection/Avatar") == null) return;
+                    GL.Vertex(player.gameObject.transform.Find("ForwardDirection/Avatar").position);
+                    GL.Vertex(Networking.LocalPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position);
+                    GL.End();
+                    GL.PopMatrix();
+                }
+            }
+            static void CreateLineMaterial()
+            {
+                lineMaterial = new Material(Shader.Find("Hidden/Internal-Colored"));
+                lineMaterial.SetInt("_ZTest", 0);
+                lineMaterial.SetColor("Color", new Color(0x56, 0x00, 0xA5));
+                lineMaterial.renderQueue = 5000;
+
             }
         }
     }
+
 }
