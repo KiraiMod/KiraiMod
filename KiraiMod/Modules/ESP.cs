@@ -42,7 +42,7 @@ namespace KiraiMod.Modules
 
         private static void Set(Transform transform, bool state)
         {
-            foreach (Renderer renderer in transform.GetComponentsInChildren<Renderer>(true))
+            foreach (SkinnedMeshRenderer renderer in transform.GetComponentsInChildren<SkinnedMeshRenderer>(true))
                 if (renderer.bounds.extents.x <= 1.5 || renderer.bounds.extents.y <= 1.5 || renderer.bounds.extents.z <= 1.5)
                     Core.Types.HighlightsFX.Highlight(renderer, state);
         }
