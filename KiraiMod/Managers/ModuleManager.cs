@@ -20,7 +20,11 @@ namespace KiraiMod.Managers
 
             foreach (Type module in Modules["Modules"])
                 if (!module.IsNested)
-                    module.Initialize();
+                {
+                    Plugin.log.LogDebug("Loading " + module.FullName);
+                    try { module.Initialize(); } 
+                    catch (Exception ex) { Plugin.log.LogError("Exception occurred whilst loading " + module.FullName + ": " + ex); }
+                }
         }
 
         public static void Register() => Register(Assembly.GetCallingAssembly());
