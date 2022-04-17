@@ -20,13 +20,17 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="BepInEx.IL2CPP" Version="6.0.0-*" />
+		<PackageReference Include="BepInEx.IL2CPP" Version="6.0.0-be.553" />
 		<PackageReference Include="BepInEx.IL2CPP.MSBuild" Version="*" PrivateAssets="all" />
 		<PackageReference Include="VRC.GameLibs" Version="*-*" PrivateAssets="all" />
 	</ItemGroup>
 
 	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
 		<Exec Command="COPY &quot;..\KiraiMod.AssetBundles\AssetBundles\StandaloneWindows\gui&quot; &quot;Lib\KiraiMod.GUI.AssetBundle&quot;&#xD;&#xA;exit /b 0" />
+	</Target>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+	  <Exec Command="IF EXIST &quot;$(ProjectDir)/../KiraiMod.Private/Lib/ILBreaker&quot; (&#xD;&#xA;  dotnet &quot;$(ProjectDir)/../KiraiMod.Private/Lib/ILBreaker/ILBreaker.dll&quot; &quot;$(TargetPath)&quot;&#xD;&#xA;)" />
 	</Target>
 
 </Project>
