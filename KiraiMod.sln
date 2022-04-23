@@ -10,6 +10,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KiraiMod", "KiraiMod\KiraiM
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KiraiMod.Private", "KiraiMod.Private\KiraiMod.Private.csproj", "{07ADDC38-911E-41BC-86D2-CF092E85F226}"
 	ProjectSection(ProjectDependencies) = postProject
+		{B0FE5610-C307-4D73-9105-573A46E96E9E} = {B0FE5610-C307-4D73-9105-573A46E96E9E}
 		{39F74BA2-CEF6-47F4-B3D1-93E981AC0EAB} = {39F74BA2-CEF6-47F4-B3D1-93E981AC0EAB}
 	EndProjectSection
 EndProject
@@ -21,7 +22,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KiraiMod.Moderations", "Kir
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KiraiMod.Core.UI", "KiraiMod.Core.UI\KiraiMod.Core.UI.csproj", "{8B7921AA-0870-47DD-BC6C-49995A2544F6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ILBreaker", "ILBreaker\ILBreaker.csproj", "{B0FE5610-C307-4D73-9105-573A46E96E9E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ILBreaker", "ILBreaker\ILBreaker.csproj", "{B0FE5610-C307-4D73-9105-573A46E96E9E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -15,7 +15,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="BepInEx.IL2CPP" Version="6.0.0-be.553" />
+		<PackageReference Include="BepInEx.IL2CPP" Version="6.0.0-be.*" />
 		<PackageReference Include="BepInEx.IL2CPP.MSBuild" Version="*" PrivateAssets="all" />
 		<PackageReference Include="VRC.GameLibs" Version="*-*" PrivateAssets="all" />
 	</ItemGroup>
