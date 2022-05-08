@@ -6,14 +6,6 @@
 	path = KiraiMod.Core
 	url = https://github.com/KiraiMod/Core
 	branch = master
-[submodule "KiraiMod.AssetBundles"]
-	path = KiraiMod.AssetBundles
-	url = https://github.com/KiraiMod/AssetBundles
-	branch = master
-[submodule "KiraiMod.Private"]
-	path = KiraiMod.Private
-	url = https://github.com/KiraiMod/Private
-	branch = master
 [submodule "KiraiMod.Core.UI"]
 	path = KiraiMod.Core.UI
 	url = https://github.com/KiraiMod/Core.UI
