@@ -1,5 +1,5 @@
 <Project>
-	<Target Name="BuildScripts" AfterTargets="AfterBuild">
+	<Target Name="BuildScripts" AfterTargets="AfterBuild" Condition=" '$(OS)' == 'Windows_NT' ">
 		<Exec Command='
 			IF NOT EXIST "$(ProjectDir)/.build.ignore" (
 				IF "$(ConfigurationName)" == "Release" (
@@ -16,6 +16,15 @@
 
 				COPY "$(TargetPath)" "C:/Program Files (x86)/Steam/steamapps/common/VRChat.BepInEx/BepInEx/Plugins/KiraiMod" > NUL
 			)
-		' Condition=" '$(OS)' == 'Windows_NT' "/>
+		'/>
     </Target>
+	<Target Name="BuildScripts" AfterTargets="AfterBuild" Condition=" '$(OS)' == 'Unix' ">
+		<Exec Command='
+			if [ ! -f $(ProjectDir)/.build.ignore ]; then
+				if [ -d ~/.var/app/com.valvesoftware.Steam/.local/share/Steam/steamapps/common/VRChat/BepInEx/plugins/KiraiMod ]; then
+					cp $(TargetPath) ~/.var/app/com.valvesoftware.Steam/.local/share/Steam/steamapps/common/VRChat/BepInEx/plugins/KiraiMod/
+				fi
+			fi
+		'/>
+	</Target>
 </Project>
