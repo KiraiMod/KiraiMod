@@ -13,3 +13,7 @@
 [submodule "TypeScanner"]
 	path = TypeScanner
 	url = https://github.com/xKiraiChan/TypeScanner
+[submodule "KiraiMod"]
+	path = KiraiMod
+	url = https://github.com/KiraiMod/Public
+	branch = master
